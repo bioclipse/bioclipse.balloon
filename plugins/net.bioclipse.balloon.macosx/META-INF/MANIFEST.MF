@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Balloon Macosx
+Bundle-SymbolicName: net.bioclipse.balloon.macosx
+Bundle-Version: 1.0.0
+Bundle-Vendor: The Bioclipse Team
+Fragment-Host: net.bioclipse.balloon;bundle-version="0.1.1"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Export-Package: net.bioclipse.balloon.runner
+Bundle-ClassPath: .
+Import-Package: org.apache.log4j;version="1.2.15"
+Require-Bundle: net.bioclipse.jnati;bundle-version="0.2.0"
