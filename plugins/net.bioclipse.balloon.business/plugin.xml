@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="net.bioclipse.scripting.contribution">
+      <scriptContribution
+            id="net.bioclipse.balloon.business.BalloonManager"
+            service="net.bioclipse.balloon.business.BalloonManagerFactory">
+      </scriptContribution>
+   </extension>
+
+
+
+   <extension
+         point="org.eclipse.ui.menus">
+         
+         <menuContribution
+           locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+            <command
+                  commandId="net.bioclipse.balloon.commands.runCommand"
+                  id="net.bioclipse.balloon.popup.runCommand"
+                  mnemonic="B">
+          <visibleWhen checkEnabled="true">
+		<iterate operator="and" ifEmpty="false">
+		
+		<or>
+  		    <adapt type="org.eclipse.core.resources.IResource">
+         		<or>
+                    <!--test property="org.eclipse.core.resources.contentTypeId" 
+            	    	value="net.bioclipse.contenttypes.smi"/-->
+   	      		     <test property="org.eclipse.core.resources.contentTypeId" 
+        	        	value="net.bioclipse.contenttypes.sdf"/>
+   	      		     <test property="org.eclipse.core.resources.contentTypeId" 
+        	        	value="net.bioclipse.contenttypes.mdlMolFile2D"/>
+  	      		     <test property="org.eclipse.core.resources.contentTypeId" 
+        	        	value="net.bioclipse.contenttypes.mdlMolFile3D"/>
+               	</or>
+                   </adapt>
+                   <adapt type="net.bioclipse.core.domain.IMolecule" />
+       </or>
+	   </iterate>
+	   
+        </visibleWhen>
+            </command>
+        </menuContribution>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="net.bioclipse.balloon.commands.category"
+            name="Balloon Category">
+      </category>
+      <command
+            categoryId="net.bioclipse.balloon.commands.category"
+            id="net.bioclipse.balloon.commands.runCommand"
+            name="Run Balloon">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="net.bioclipse.balloon.handlers.BalloonHandler"
+            commandId="net.bioclipse.balloon.commands.runCommand">
+      </handler>
+   </extension>
+
+</plugin>
