@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Jnati
+Bundle-SymbolicName: net.bioclipse.jnati
+Bundle-Version: 0.2.0
+Bundle-Activator: net.bioclipse.jnati.Activator
+Bundle-Vendor: The Bioclipse Team
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: jars/jnati-core-0.2-SNAPSHOT.jar,
+ jars/jnati-proc-0.2-SNAPSHOT.jar,
+ .
+Export-Package: net.bioclipse.jnati,
+ net.sf.jnati,
+ net.sf.jnati.proc
