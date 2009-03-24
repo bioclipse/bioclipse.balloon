@@ -49,13 +49,14 @@ public interface IBalloonManager extends IBioclipseManager {
      * @param inputfile Path to inputfile as String
      * @param outputfile Path to inputfile as String
      * @return
+     * @throws BioclipseException 
      */
     @PublishedMethod(methodSummary="Generated 3D coodrinates for all molecules " +
         "in the inputfile. " +
     "Inputs: String inputfile = path to inputfile, " +
     "String outputfile = path to outputfile")
     @Recorded
-    String generate3Dcoordinates( String inputfile, String outputfile );
+    String generate3Dcoordinates( String inputfile, String outputfile ) throws BioclipseException;
 
     /**
      * Generate 3D conformations for an inputfile to a dedicated outputfile

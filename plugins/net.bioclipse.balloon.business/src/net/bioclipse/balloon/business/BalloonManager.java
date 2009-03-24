@@ -11,9 +11,11 @@
 package net.bioclipse.balloon.business;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -37,13 +39,16 @@ public class BalloonManager implements IBalloonManager {
 
     private static final Logger logger =Logger.getLogger( BalloonManager.class );
 
+    /**
+     * Defines the Bioclipse namespace for balloon.
+     * Appears in the scripting language as the namespace/prefix
+     */
     public String getNamespace() {
-
         return "balloon";
     }
 
-    public List<String> generate3Dcoordinates( List<String> inputfiles ) throws BioclipseException {
 
+    public List<String> generate3Dcoordinates( List<String> inputfiles ) throws BioclipseException {
         return generate3Dcoordinates( inputfiles, 1 );
     }
 
@@ -52,7 +57,6 @@ public class BalloonManager implements IBalloonManager {
 
         List<String> outputfiles = new ArrayList<String>();
         for ( String inputfile : inputfiles ) {
-            logger.debug( "Running ballon on file: " + inputfile );
             String ret = generate3Dcoordinates( inputfile , 1);
             outputfiles.add( ret );
         }
@@ -66,35 +70,70 @@ public class BalloonManager implements IBalloonManager {
 
     public String generate3Dcoordinates( String inputfile , int numConformations) throws BioclipseException {
 
-        return generate3Dconformations( inputfile, 
-                                        constructOutputFilename( inputfile, 
-                                                                 numConformations ), 
-                                                                 numConformations );
+        return generate3Dconformations( inputfile, null,numConformations );
 
     }
 
-    public String generate3Dcoordinates( String inputfile, String outputfile ) {
+    public String generate3Dcoordinates( String inputfile, String outputfile ) throws BioclipseException {
 
-        return BalloonRunner.runBalloon( inputfile, outputfile, 1 );
+        return generate3Dconformations( inputfile, outputfile, 1 );
     }
 
+    /**
+     * Generate a number of 3D conformations for a file with one or more
+     * chemical structures.
+     * 
+     * @param inputfile The inputfile with the existing structures
+     * @param outputfile Outputfile to write, will be SDF if more than one mol
+     * @param numConformations Number of conformations to generate
+     */
     public String generate3Dconformations( String inputfile, String outputfile,
                                            int numConformations ) throws BioclipseException {
 
-        String ret=BalloonRunner.runBalloon( inputfile, outputfile,
-                                             numConformations );
+        //Must have different input as output files
+        if (inputfile.equals( outputfile )) 
+            throw new IllegalArgumentException("Outputfile must be different " +
+            		"from inputfile for Balloon ");
+        
+        IFile inIfile=ResourcePathTransformer.getInstance().transform( inputfile );
+        String infile=inIfile.getRawLocation().toOSString();
 
-        if (ret!=null){
-            throw new BioclipseException("Balloon faild: " + ret);
+        String outfile="";
+        if (outputfile==null){
+            outfile=constructOutputFilename( infile, numConformations );
+        }else{
+            IFile outIfile=ResourcePathTransformer.getInstance().transform( outputfile );
+            outfile=outIfile.getRawLocation().toOSString();
         }
-        else{
-            logger.debug( "Balloon returned: " + ret );
-            logger.debug("Balloon success, wrote file: " + outputfile);
-            return outputfile;
+
+        logger.debug( "Infile transformed to: " + infile);
+        logger.debug( "Outfile transformed to: " + outfile);
+        
+        int a=0;
+        
+        try {
+            //Create a native runner and execute Balloon with it
+            //writing from inputfile to outputfile with desired number of conformations
+            BalloonRunner runner=new BalloonRunner(new Long(20000));
+            boolean status=runner.runBalloon( infile,outfile,
+                                                 numConformations );
+            if (!status){
+                throw new BioclipseException("Balloon execution failed. Native BalloonRunner returned false." );
+            }
+        } catch ( ExecutionException e ) {
+            throw new BioclipseException("Balloon execution failed. Reason: " + e.getMessage());
+        } catch ( InterruptedException e ) {
+            throw new BioclipseException("Balloon Was interrupted. Reason: " + e.getMessage());
+        } catch ( TimeoutException e ) {
+            throw new BioclipseException("Balloon timed out. Reason: " + e.getMessage());
+        } catch ( IOException e ) {
+            throw new BioclipseException("Balloon I/O error. Reason: " + e.getMessage());
         }
+        
+        logger.debug("Balloon run successful, wrote file: " + outfile);
+        return outfile;
+
     }
-
-
 
 
 
@@ -104,7 +143,7 @@ public class BalloonManager implements IBalloonManager {
      * @param numConformations
      * @return
      */
-    public String constructOutputFilename(String inputfile, int numConformations){
+    private String constructOutputFilename(String inputfile, int numConformations){
 
         int lastpathsep=inputfile.lastIndexOf( File.separator );
         String path=inputfile.substring( 0, lastpathsep );
