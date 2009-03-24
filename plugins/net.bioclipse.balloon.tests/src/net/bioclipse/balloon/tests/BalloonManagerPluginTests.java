@@ -34,7 +34,7 @@ import org.openscience.cdk.exception.CDKException;
 public class BalloonManagerPluginTests {
 
     @Test
-    public void testGenerate3D() throws URISyntaxException, MalformedURLException, IOException, BioclipseException, CDKException, CoreException{
+    public void testGenerate3DonAbsoluteFile() throws URISyntaxException, MalformedURLException, IOException, BioclipseException, CDKException, CoreException{
         
         IBalloonManager ballon = Activator.getDefault().getBalloonManager();
         ICDKManager cdk = net.bioclipse.cdk.business.Activator.getDefault().getCDKManager();
@@ -48,6 +48,7 @@ public class BalloonManagerPluginTests {
         assertFalse( cdk.has3d( mol ));
 
         String res=ballon.generate3Dcoordinates( path );
+        assertNotNull( "Balloon returned null", res );
 
         System.out.println("wrote file: " + res);
         
@@ -72,5 +73,6 @@ public class BalloonManagerPluginTests {
         assertFalse( cdk.has2d( mol2 ));
 
     }
+
 
 }
