@@ -109,8 +109,6 @@ public class BalloonManager implements IBalloonManager {
         logger.debug( "Infile transformed to: " + infile);
         logger.debug( "Outfile transformed to: " + outfile);
         
-        int a=0;
-        
         try {
             //Create a native runner and execute Balloon with it
             //writing from inputfile to outputfile with desired number of conformations
@@ -148,14 +146,15 @@ public class BalloonManager implements IBalloonManager {
         int lastpathsep=inputfile.lastIndexOf( File.separator );
         String path=inputfile.substring( 0, lastpathsep );
         String name=inputfile.substring( lastpathsep+1, inputfile.length()-4 );
+        String currentExtension=inputfile.substring( inputfile.length()-4, inputfile.length() );
 
         String ext="";
         if (numConformations>1) ext=".sdf";
-        else ext=".mol";
+        else ext=currentExtension;
 
         String pathfile=path + File.separator + name;
 
-        int cnt=0;
+        int cnt=1;
         String outfile=getAFilename( pathfile, ext, cnt );
         File file=new File(outfile);
         while(file.exists()){
@@ -175,7 +174,7 @@ public class BalloonManager implements IBalloonManager {
      */
     private String getAFilename(String pathname, String ext, int cnt){
 
-        if (cnt<=0)
+        if (cnt<=1)
             return pathname+"_3d" + ext;
         else
             return pathname+"_3d_" + cnt + ext;

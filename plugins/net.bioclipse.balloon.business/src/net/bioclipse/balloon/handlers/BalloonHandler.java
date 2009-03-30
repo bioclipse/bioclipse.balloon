@@ -72,7 +72,8 @@ public class BalloonHandler extends AbstractHandler {
         for (Object obj : ssel.toList()){
             if ( obj instanceof IFile ) {
                 IFile file = (IFile) obj;
-                filenames.add( file.getRawLocation().toOSString() );
+//                filenames.add( file.getRawLocation().toOSString() );
+                filenames.add( file.getFullPath().toOSString() );
                 foldersToRefresh.add( file.getParent() );
             }
         }
