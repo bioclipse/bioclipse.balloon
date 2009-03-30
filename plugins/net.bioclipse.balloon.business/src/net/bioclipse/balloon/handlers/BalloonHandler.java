@@ -10,17 +10,12 @@
  ******************************************************************************/
 package net.bioclipse.balloon.handlers;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import net.bioclipse.balloon.business.Activator;
 import net.bioclipse.balloon.business.IBalloonManager;
 import net.bioclipse.core.business.BioclipseException;
-import net.bioclipse.core.domain.IMolecule;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.commands.AbstractHandler;
@@ -29,10 +24,13 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -43,7 +41,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
  * @see org.eclipse.core.commands.AbstractHandler
  */
 public class BalloonHandler extends AbstractHandler {
-    
+
     private static final Logger logger = Logger.getLogger(BalloonHandler.class);
 
     /**
@@ -58,8 +56,6 @@ public class BalloonHandler extends AbstractHandler {
      */
     public Object execute(ExecutionEvent event) throws ExecutionException {
 
-        IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
-
         ISelection sel = HandlerUtil.getCurrentSelection( event );
         if (sel==null) return null;
         if (!( sel instanceof StructuredSelection )) return null;
@@ -72,48 +68,78 @@ public class BalloonHandler extends AbstractHandler {
         for (Object obj : ssel.toList()){
             if ( obj instanceof IFile ) {
                 IFile file = (IFile) obj;
-//                filenames.add( file.getRawLocation().toOSString() );
+                //                filenames.add( file.getRawLocation().toOSString() );
                 filenames.add( file.getFullPath().toOSString() );
                 foldersToRefresh.add( file.getParent() );
             }
         }
-        
+
         logger.debug( "Balloon selection contained: " + filenames.size() + " files." );
 
         if (filenames.size()<=0) return null;
-        
-        //Run balloon on these files
-        IBalloonManager balloon = Activator.getDefault().getBalloonManager();
-        List<String> ret=null;
-        try {
-            ret = balloon.generate3Dcoordinates( filenames );
-        } catch ( BioclipseException e ) {
-            logger.error("Balloon failed: " + e);
-        }
 
-        if (ret==null){
-            logger.error( "Balloon failed: " + ret );
-            return null;
-        }
-        for (String r : ret){
-            logger.debug( "Balloon wrote output file: " + r  );
-        }
-        
-        //refresh folders
-        for (IResource res : foldersToRefresh){
-            try {
-                res.refreshLocal( IResource.DEPTH_ONE, new NullProgressMonitor() );
-            } catch ( CoreException e ) {
-                logger.error( "Could not refresh resource: " + res + " - " + e.getMessage() );
+        final List<String> final_fnames = filenames;
+        final List<IResource> final_foldersToRefresh = foldersToRefresh;
+
+        //Set up a job
+        Job job = new Job("Ballon 3D conformer generation") {
+            protected IStatus run(IProgressMonitor monitor) {
+
+                monitor.beginTask( "Running Balloon 3D conformer generation", 2 );
+                monitor.worked( 1 );
+                
+                //Run balloon on the files
+                IBalloonManager balloon = Activator.getDefault().getBalloonManager();
+                List<String> ret=null;
+                try {
+                    ret = balloon.generate3Dcoordinates( final_fnames);
+                } catch ( BioclipseException e ) {
+                    logger.error("Balloon failed: " + e.getMessage());
+                    return new Status(IStatus.ERROR,Activator.PLUGIN_ID,"Balloon failed: " + e.getMessage());
+                }
+
+                if (ret==null){
+                    logger.error( "Balloon failed: " + ret );
+                    return new Status(IStatus.ERROR,Activator.PLUGIN_ID,"Balloon failed.");
+                }
+                for (String r : ret){
+                    logger.debug( "Balloon wrote output file: " + r  );
+                }
+
+                //Refresh folders in UI thread
+                Display.getDefault().syncExec( new Runnable(){
+                    public void run() {
+                        for (IResource res : final_foldersToRefresh){
+                            try {
+                                res.refreshLocal( IResource.DEPTH_ONE, new NullProgressMonitor() );
+                            } catch ( CoreException e ) {
+                                logger.error( "Could not refresh resource: " + res + " - " + e.getMessage() );
+                            }
+                        }
+
+                    }
+                });
+
+                monitor.done();
+
+                return Status.OK_STATUS;
             }
-        }
+        };
+        job.setPriority(Job.LONG);
+        job.setUser( true );
+        job.schedule(); // start as soon as possible
+
+        //Bring forth the ProgressView
+
+
+
 
         /*
         //Collect and serialize smiles to temp file, 
         String smilesfile="";
         String linesep=System.getProperty("line.separator");
         if (linesep==null) linesep="\n";
-        
+
         for (Object obj : ssel.toList()){
             if ( obj instanceof IMolecule ) {
                 IMolecule mol = (IMolecule) obj;
@@ -129,21 +155,20 @@ public class BalloonHandler extends AbstractHandler {
         }
 
 
-        
+
         try {
             File tfile = File.createTempFile( "balloontemp", "smi" );
             FileWriter writer= new FileWriter(tfile);
             writer.write( smilesfile );
             writer.close();
-            
+
             //Run balloon on this file
-            
+
         } catch ( IOException e ) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        */
-        
+         */
+
         return null;
 
     }
