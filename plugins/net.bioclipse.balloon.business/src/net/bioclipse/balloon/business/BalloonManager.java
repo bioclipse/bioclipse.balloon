@@ -48,36 +48,47 @@ public class BalloonManager implements IBalloonManager {
     }
 
 
-    public List<String> generate3Dcoordinates( List<String> inputfiles ) throws BioclipseException {
-        return generate3Dcoordinates( inputfiles, 1 );
-    }
-
-    public List<String> generate3Dcoordinates( List<String> inputfiles,
-                                               int numConformations ) throws BioclipseException {
-
-        List<String> outputfiles = new ArrayList<String>();
-        for ( String inputfile : inputfiles ) {
-            String ret = generate3Dcoordinates( inputfile , 1);
-            outputfiles.add( ret );
-        }
-        return outputfiles;
-    }
-
+    /**
+     * Generate 3D for a single file
+     */
     public String generate3Dcoordinates( String inputfile ) throws BioclipseException {
-        return generate3Dcoordinates( inputfile, 1 );
+        return generate3Dconformations( inputfile, 1 );
     }
 
-
-    public String generate3Dcoordinates( String inputfile , int numConformations) throws BioclipseException {
-
-        return generate3Dconformations( inputfile, null,numConformations );
-
+    /**
+     * Generate 3D for a list of files
+     */
+    public List<String> generate3Dcoordinates( List<String> inputfiles ) throws BioclipseException {
+        return generate3Dconformations( inputfiles, 1 );
     }
 
+    /**
+     * Generate 3D for a single file with ouput file specified
+     */
     public String generate3Dcoordinates( String inputfile, String outputfile ) throws BioclipseException {
-
         return generate3Dconformations( inputfile, outputfile, 1 );
     }
+
+    /**
+     * Generate n 3D conformations for a single file
+     */
+    public String generate3Dconformations( String inputfile , int numConformations) throws BioclipseException {
+        return generate3Dconformations( inputfile, null,numConformations );
+    }
+
+    /**
+     * Generate n 3D conformations for a list of files
+     */
+    public List<String> generate3Dconformations( List<String> inputfiles,
+                                                 int numConformations ) throws BioclipseException {
+
+          List<String> outputfiles = new ArrayList<String>();
+          for ( String inputfile : inputfiles ) {
+              String ret = generate3Dconformations( inputfile , numConformations);
+              outputfiles.add( ret );
+          }
+          return outputfiles;
+      }
 
     /**
      * Generate a number of 3D conformations for a file with one or more

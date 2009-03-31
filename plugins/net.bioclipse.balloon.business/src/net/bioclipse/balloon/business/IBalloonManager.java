@@ -102,7 +102,7 @@ public interface IBalloonManager extends IBioclipseManager {
                  "Inputs: List<String> inputfiles = list of Strings with paths to inputfiles, " +
     "int numConformations = number of conformations to generate per molecule.")
     @Recorded
-    List<String> generate3Dcoordinates( List<String> inputfiles, int numConformations) throws BioclipseException;
+    List<String> generate3Dconformations( List<String> inputfiles, int numConformations) throws BioclipseException;
 
     /**
      * TODO: document
@@ -111,6 +111,6 @@ public interface IBalloonManager extends IBioclipseManager {
      * @return
      * @throws BioclipseException 
      */
-    String generate3Dcoordinates( String inputfile, int numConformations ) throws BioclipseException;
+    String generate3Dconformations( String inputfile, int numConformations ) throws BioclipseException;
 
 }
