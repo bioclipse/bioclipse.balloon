@@ -40,14 +40,14 @@ import org.eclipse.jface.viewers.StructuredSelection;
  * @see org.eclipse.core.commands.IHandler
  * @see org.eclipse.core.commands.AbstractHandler
  */
-public class BalloonHandler extends AbstractHandler {
+public class BalloonGen3DHandler extends AbstractHandler {
 
-    private static final Logger logger = Logger.getLogger(BalloonHandler.class);
+    private static final Logger logger = Logger.getLogger(BalloonGen3DHandler.class);
 
     /**
      * The constructor.
      */
-    public BalloonHandler() {
+    public BalloonGen3DHandler() {
     }
 
     /**
