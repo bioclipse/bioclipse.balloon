@@ -30,6 +30,8 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.swt.widgets.Display;
 
 import net.bioclipse.balloon.runner.BalloonRunner;
+import net.bioclipse.cdk.business.ICDKManager;
+import net.bioclipse.cdk.domain.ICDKMolecule;
 import net.bioclipse.core.ResourcePathTransformer;
 import net.bioclipse.core.business.BioclipseException;
 import net.bioclipse.ui.business.Activator;
@@ -145,6 +147,25 @@ public class BalloonManager implements IBalloonManager {
                        condesc.getContentType().getName() + 
                        " which is not supported by balloon.");
 
+        //If this is a CML file we need to serialize an MDL file as input
+        IContentType cmlType = Platform.getContentTypeManager()
+        .getContentType( "net.bioclipse.contenttypes.cml.singleMolecule2d" );
+
+        if (condesc.getContentType().isKindOf( cmlType )){
+            //We have a CML file. Needs serialization to temp MDL file
+            ICDKManager cdk=net.bioclipse.cdk.business.Activator.getDefault().
+                getCDKManager();
+            try {
+                ICDKMolecule cdkmol = cdk.loadMolecule( inIfile );
+                File f = File.createTempFile("balloon", "mdl");
+                //TODO: continue here
+
+            } catch ( Exception e ) {
+                throw new BioclipseException("Could not parse input file: " + 
+                                             e.getMessage());
+            }
+        }
+
         IUIManager ui = Activator.getDefault().getUIManager();
 
         String outfile="";
@@ -204,8 +225,8 @@ public class BalloonManager implements IBalloonManager {
         //no easy way to read this info from there
         supportedContentTypes=new ArrayList<String>();
         supportedContentTypes.add( "net.bioclipse.contenttypes.sdf" );
-        supportedContentTypes.add( "net.bioclipse.contenttypes.mdlMolFile2D" );
-        supportedContentTypes.add( "net.bioclipse.contenttypes.mdlMolFile3D" );
+        supportedContentTypes.add( "net.bioclipse.contenttypes.mdlMolFile" );
+//        supportedContentTypes.add( "net.bioclipse.contenttypes.cml.singleMolecule2d" );
         
     }
 
