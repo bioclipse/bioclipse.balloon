@@ -1,7 +1,5 @@
 package net.bioclipse.balloon.ui;
 
-import net.bioclipse.balloon.business.Activator;
-
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
@@ -15,8 +13,14 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-
+/**
+ * A dialog to select number of conformers for generation with balloon
+ * @author ola
+ *
+ */
 public class BalloonDialog extends TitleAreaDialog{
+
+    private static final String DEFAULT_NUM_CONFORMERS = "15";
 
     int numConformers;
     private Text txtNumConf;
@@ -49,13 +53,14 @@ public class BalloonDialog extends TitleAreaDialog{
         titleBarSeparator.setLayoutData(gdl);
 
         Label lblNumConf=new Label(composite,SWT.NONE);
-        lblNumConf.setText( "Number of conformations:  " );
+        lblNumConf.setText( "Number of conformations (target):  " );
         lblNumConf.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false));
 
         txtNumConf=new Text(composite, SWT.BORDER);
         GridData gd=new GridData(SWT.LEFT, SWT.NONE, true, false);
         gd.widthHint=100;
         txtNumConf.setLayoutData(gd);
+        txtNumConf.setText( DEFAULT_NUM_CONFORMERS );
 
         txtNumConf.addKeyListener( new KeyListener(){
 
