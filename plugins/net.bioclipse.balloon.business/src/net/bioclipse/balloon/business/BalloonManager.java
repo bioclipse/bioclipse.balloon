@@ -19,6 +19,10 @@ import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.content.IContentDescription;
+import org.eclipse.core.runtime.content.IContentType;
 
 import net.bioclipse.balloon.runner.BalloonRunner;
 import net.bioclipse.core.ResourcePathTransformer;
@@ -39,6 +43,8 @@ public class BalloonManager implements IBalloonManager {
 
     private static final Logger logger =Logger.getLogger( BalloonManager.class );
 
+    private static List<String> supportedContentTypes;
+    
     /**
      * Defines the Bioclipse namespace for balloon.
      * Appears in the scripting language as the namespace/prefix
@@ -100,6 +106,9 @@ public class BalloonManager implements IBalloonManager {
      */
     public String generate3Dconformations( String inputfile, String outputfile,
                                            int numConformations ) throws BioclipseException {
+        
+        if (supportedContentTypes==null)
+            fillSupportedContentTypes();
 
         //Must have different input as output files
         if (inputfile.equals( outputfile )) 
@@ -108,6 +117,26 @@ public class BalloonManager implements IBalloonManager {
         
         IFile inIfile=ResourcePathTransformer.getInstance().transform( inputfile );
         String infile=inIfile.getRawLocation().toOSString();
+
+        IContentDescription condesc=null;
+        try {
+            condesc = inIfile.getContentDescription();
+        } catch ( CoreException e ) {
+            throw new BioclipseException("The file " + inputfile + 
+            " has unknown contenttype: " + e.getMessage()); 
+        }
+
+        if (condesc==null)
+            throw new BioclipseException("The file " + inputfile + 
+                                         " has no contenttype and is hence not " +
+                                         "supported for ballloon"); 
+            
+        //Verify content types
+        if (!isSupportedContenttype(condesc))
+                throw new BioclipseException("The file " + inputfile + 
+                       " has content type: " + 
+                       condesc.getContentType().getName() + 
+                       " which is not supported by balloon.");
 
         String outfile="";
         if (outputfile==null){
@@ -144,6 +173,33 @@ public class BalloonManager implements IBalloonManager {
 
     }
 
+
+
+    private void fillSupportedContentTypes() {
+
+        //These entries need to match the command in plugin.xml but found
+        //no easy way to read this info from there
+        supportedContentTypes=new ArrayList<String>();
+        supportedContentTypes.add( "net.bioclipse.contenttypes.sdf" );
+        supportedContentTypes.add( "net.bioclipse.contenttypes.mdlMolFile2D" );
+        supportedContentTypes.add( "net.bioclipse.contenttypes.mdlMolFile3D" );
+        
+    }
+
+
+    private boolean isSupportedContenttype(IContentDescription condesc) {
+
+        for (String supCon : supportedContentTypes){
+            IContentType testType = Platform.getContentTypeManager()
+                .getContentType( supCon );
+            
+            if (testType!=null && condesc.getContentType().isKindOf( testType ))
+                return true;
+            
+        }
+
+        return false;
+    }
 
 
     /**
