@@ -18,15 +18,22 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.swt.widgets.Display;
 
 import net.bioclipse.balloon.runner.BalloonRunner;
 import net.bioclipse.core.ResourcePathTransformer;
 import net.bioclipse.core.business.BioclipseException;
+import net.bioclipse.ui.business.Activator;
+import net.bioclipse.ui.business.IUIManager;
 
 /**
  * A Bioclipse Manager for invoking Balloon
@@ -138,16 +145,23 @@ public class BalloonManager implements IBalloonManager {
                        condesc.getContentType().getName() + 
                        " which is not supported by balloon.");
 
+        IUIManager ui = Activator.getDefault().getUIManager();
+
         String outfile="";
+        
+        IContainer containerToRefresh=null;
         if (outputfile==null){
             outfile=constructOutputFilename( infile, numConformations );
+            containerToRefresh=inIfile.getParent();
         }else{
             IFile outIfile=ResourcePathTransformer.getInstance().transform( outputfile );
             outfile=outIfile.getRawLocation().toOSString();
+            containerToRefresh=outIfile.getParent();
         }
 
         logger.debug( "Infile transformed to: " + infile);
         logger.debug( "Outfile transformed to: " + outfile);
+        logger.debug( "Parent folder to refresh: " + containerToRefresh.getName());
         
         try {
             //Create a native runner and execute Balloon with it
@@ -169,6 +183,15 @@ public class BalloonManager implements IBalloonManager {
         }
         
         logger.debug("Balloon run successful, wrote file: " + outfile);
+        
+        ui.refresh(containerToRefresh.getFullPath().toOSString(), 
+                   new NullProgressMonitor());
+        
+        //FIXME: the following produces a copy in Virtual
+        //Filed as bug 984 dependning on 983
+        //remove comments upon fix
+//        ui.revealAndSelect( outfile );
+
         return outfile;
 
     }
