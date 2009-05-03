@@ -30,11 +30,15 @@
                     <!--test property="org.eclipse.core.resources.contentTypeId" 
             	    	value="net.bioclipse.contenttypes.smi"/-->
    	      		     <test property="org.eclipse.core.resources.contentTypeId" 
-        	        	value="net.bioclipse.contenttypes.sdf"/>
+        	        	value="net.bioclipse.contenttypes.sdf2d"/>
+   	      		     <test property="org.eclipse.core.resources.contentTypeId" 
+        	        	value="net.bioclipse.contenttypes.sdf3d"/>
    	      		     <test property="org.eclipse.core.resources.contentTypeId" 
         	        	value="net.bioclipse.contenttypes.mdlMolFile2D"/>
-  	      		     <test property="org.eclipse.core.resources.contentTypeId" 
+   	      		     <test property="org.eclipse.core.resources.contentTypeId" 
         	        	value="net.bioclipse.contenttypes.mdlMolFile3D"/>
+  	      		     <test property="org.eclipse.core.resources.contentTypeId" 
+        	        	value="net.bioclipse.contenttypes.cml.singleMolecule2d"/>
                	</or>
                </adapt>
 	        </iterate>
@@ -48,7 +52,7 @@
            commandId="net.bioclipse.balloon.commands.genConformersCommand"
            id="net.bioclipse.balloon.popup.genConformersCommand"
            icon="icons/balloon16.gif"
-           mnemonic="B">
+           mnemonic="C">
           <visibleWhen checkEnabled="true">
   		     <iterate operator="and" ifEmpty="false">
 		
@@ -57,11 +61,15 @@
                     <!--test property="org.eclipse.core.resources.contentTypeId" 
             	    	value="net.bioclipse.contenttypes.smi"/-->
    	      		     <test property="org.eclipse.core.resources.contentTypeId" 
-        	        	value="net.bioclipse.contenttypes.sdf"/>
+        	        	value="net.bioclipse.contenttypes.sdf2d"/>
+   	      		     <test property="org.eclipse.core.resources.contentTypeId" 
+        	        	value="net.bioclipse.contenttypes.sdf3d"/>
    	      		     <test property="org.eclipse.core.resources.contentTypeId" 
         	        	value="net.bioclipse.contenttypes.mdlMolFile2D"/>
-  	      		     <test property="org.eclipse.core.resources.contentTypeId" 
+   	      		     <test property="org.eclipse.core.resources.contentTypeId" 
         	        	value="net.bioclipse.contenttypes.mdlMolFile3D"/>
+  	      		     <test property="org.eclipse.core.resources.contentTypeId" 
+        	        	value="net.bioclipse.contenttypes.cml.singleMolecule2d"/>
                	</or>
                </adapt>
 	        </iterate>

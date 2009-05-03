@@ -11,6 +11,7 @@
 package net.bioclipse.balloon.business;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -147,24 +148,6 @@ public class BalloonManager implements IBalloonManager {
                        condesc.getContentType().getName() + 
                        " which is not supported by balloon.");
 
-        //If this is a CML file we need to serialize an MDL file as input
-        IContentType cmlType = Platform.getContentTypeManager()
-        .getContentType( "net.bioclipse.contenttypes.cml.singleMolecule2d" );
-
-        if (condesc.getContentType().isKindOf( cmlType )){
-            //We have a CML file. Needs serialization to temp MDL file
-            ICDKManager cdk=net.bioclipse.cdk.business.Activator.getDefault().
-                getCDKManager();
-            try {
-                ICDKMolecule cdkmol = cdk.loadMolecule( inIfile );
-                File f = File.createTempFile("balloon", "mdl");
-                //TODO: continue here
-
-            } catch ( Exception e ) {
-                throw new BioclipseException("Could not parse input file: " + 
-                                             e.getMessage());
-            }
-        }
 
         IUIManager ui = Activator.getDefault().getUIManager();
 
@@ -179,15 +162,47 @@ public class BalloonManager implements IBalloonManager {
             outfile=outIfile.getRawLocation().toOSString();
             containerToRefresh=outIfile.getParent();
         }
+        
+        //If this is a CML file we need to serialize an MDL file as input
+        IContentType cmlType = Platform.getContentTypeManager()
+        .getContentType( "net.bioclipse.contenttypes.cml.singleMolecule2d" );
+
+        if (condesc.getContentType().isKindOf( cmlType )){
+            
+            logger.debug("File is CML, serialize to temp file as MDL");
+
+            ICDKManager cdk=net.bioclipse.cdk.business.Activator.getDefault().
+                getCDKManager();
+            
+            try {
+                ICDKMolecule cdkmol = cdk.loadMolecule( inIfile, new NullProgressMonitor() );
+                File f = File.createTempFile("balloon", "mdl");
+
+                //Write mol as MDL to the temp file
+                String mdlString=cdk.getMDLMolfileString( cdkmol );
+                FileWriter w = new FileWriter(f);
+                w.write( mdlString );
+                w.close();
+                logger.debug("Wrote temp MDL file as: " + f.getAbsolutePath());
+
+                //Set this file as input file
+                infile=f.getAbsolutePath();
+
+            } catch ( Exception e ) {
+                throw new BioclipseException("Could not parse input file: " + 
+                                             e.getMessage());
+            }
+        }
+
 
         logger.debug( "Infile transformed to: " + infile);
         logger.debug( "Outfile transformed to: " + outfile);
         logger.debug( "Parent folder to refresh: " + containerToRefresh.getName());
         
         try {
-            //Create a native runner and execute Balloon with it
+            //Create a native runner and execute Balloon with it for a certain timeout
             //writing from inputfile to outputfile with desired number of conformations
-            BalloonRunner runner=new BalloonRunner(new Long(20000));
+            BalloonRunner runner=new BalloonRunner(new Long(60000));
             boolean status=runner.runBalloon( infile,outfile,
                                                  numConformations );
             if (!status){
@@ -211,7 +226,7 @@ public class BalloonManager implements IBalloonManager {
         //FIXME: the following produces a copy in Virtual
         //Filed as bug 984 dependning on 983
         //remove comments upon fix
-//        ui.revealAndSelect( outfile );
+        ui.revealAndSelect( outfile );
 
         return outfile;
 
@@ -224,9 +239,10 @@ public class BalloonManager implements IBalloonManager {
         //These entries need to match the command in plugin.xml but found
         //no easy way to read this info from there
         supportedContentTypes=new ArrayList<String>();
+        supportedContentTypes.add( "net.bioclipse.contenttypes.smi" );
         supportedContentTypes.add( "net.bioclipse.contenttypes.sdf" );
         supportedContentTypes.add( "net.bioclipse.contenttypes.mdlMolFile" );
-//        supportedContentTypes.add( "net.bioclipse.contenttypes.cml.singleMolecule2d" );
+        supportedContentTypes.add( "net.bioclipse.contenttypes.cml.singleMolecule2d" );
         
     }
 
