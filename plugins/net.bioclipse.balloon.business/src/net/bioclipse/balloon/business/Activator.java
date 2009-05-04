@@ -13,6 +13,7 @@ package net.bioclipse.balloon.business;
 import net.bioclipse.core.util.LogUtils;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -23,77 +24,96 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class Activator extends AbstractUIPlugin {
 
-	// The plug-in ID
-	public static final String PLUGIN_ID = "net.bioclipse.balloon.business";
+    // The plug-in ID
+    public static final String PLUGIN_ID = "net.bioclipse.balloon.business";
 
-	// The shared instance
-	private static Activator plugin;
+    // The shared instance
+    private static Activator plugin;
 
-  private static final Logger logger = Logger.getLogger(Activator.class);
+    private static final Logger logger = Logger.getLogger(Activator.class);
 
-  private ServiceTracker finderTracker;
+    //Preference string for timeout
+    public static final String BALLOON_TIMEOUT = "balloon.timout";
 
-	/**
-	 * The constructor
-	 */
-	public Activator() {
-	}
+    //Default timeout is 1 minute
+    public static final int DEFAULT_BALLOON_TIMEOUT = 60;
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
-		
-    finderTracker = new ServiceTracker( context, 
-                                        IBalloonManager.class.getName(), 
-                                        null );
-                                finderTracker.open();
-	}
+    private ServiceTracker finderTracker;
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
+    /**
+     * The constructor
+     */
+    public Activator() {
+    }
 
-	/**
-	 * Returns the shared instance
-	 *
-	 * @return the shared instance
-	 */
-	public static Activator getDefault() {
-		return plugin;
-	}
-	
-  /**
-   * Returns an image descriptor for the image file at the given
-   * plug-in relative path
-   *
-   * @param path the path
-   * @return the image descriptor
-   */
-  public static ImageDescriptor getImageDescriptor(String path) {
-      return imageDescriptorFromPlugin(PLUGIN_ID, path);
-  }
-  
-  public IBalloonManager getBalloonManager() {
-      IBalloonManager manager = null;
-      try {
-          manager = (IBalloonManager) finderTracker.waitForService(1000*10);
-      } catch (InterruptedException e) {
-          logger.warn("Exception occurred while attempting to get the BalloonManager" + e);
-          LogUtils.debugTrace(logger, e);
-      }
-      if(manager == null) {
-          throw new IllegalStateException("Could not get the balloon manager");
-      }
-      return manager;
-  }
-  
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+     */
+    public void start(BundleContext context) throws Exception {
+        super.start(context);
+        plugin = this;
+
+        finderTracker = new ServiceTracker( context, 
+                                            IBalloonManager.class.getName(), 
+                                            null );
+        finderTracker.open();
+        
+        getPreferenceStore().setDefault(BALLOON_TIMEOUT, DEFAULT_BALLOON_TIMEOUT);
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+     */
+    public void stop(BundleContext context) throws Exception {
+        plugin = null;
+        super.stop(context);
+    }
+
+    /**
+     * Returns the shared instance
+     *
+     * @return the shared instance
+     */
+    public static Activator getDefault() {
+        return plugin;
+    }
+
+    /**
+     * Returns an image descriptor for the image file at the given
+     * plug-in relative path
+     *
+     * @param path the path
+     * @return the image descriptor
+     */
+    public static ImageDescriptor getImageDescriptor(String path) {
+        return imageDescriptorFromPlugin(PLUGIN_ID, path);
+    }
+
+    public IBalloonManager getBalloonManager() {
+        IBalloonManager manager = null;
+        try {
+            manager = (IBalloonManager) finderTracker.waitForService(1000*10);
+        } catch (InterruptedException e) {
+            logger.warn("Exception occurred while attempting to get the BalloonManager" + e);
+            LogUtils.debugTrace(logger, e);
+        }
+        if(manager == null) {
+            throw new IllegalStateException("Could not get the balloon manager");
+        }
+        return manager;
+    }
+
+    /** 
+     * Initializes a preference store with default preference values 
+     * for this plug-in.
+     */
+    protected void initializeDefaultPreferences(IPreferenceStore store) {
+        store.setDefault(BALLOON_TIMEOUT, DEFAULT_BALLOON_TIMEOUT);
+        logger.debug("Default balloon preferences set timeout: " + DEFAULT_BALLOON_TIMEOUT);
+    }
+
+
 }

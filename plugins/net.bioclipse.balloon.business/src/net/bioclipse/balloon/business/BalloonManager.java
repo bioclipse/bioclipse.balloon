@@ -200,9 +200,20 @@ public class BalloonManager implements IBalloonManager {
         logger.debug( "Parent folder to refresh: " + containerToRefresh.getName());
         
         try {
+
+            //Read timeout from prefs
+            int timeout=Activator.getDefault().getPreferenceStore().getInt( net.bioclipse.balloon.business.Activator.BALLOON_TIMEOUT );
+
+            //Just to be sure...
+            if (timeout<=0)
+                timeout=net.bioclipse.balloon.business.Activator.DEFAULT_BALLOON_TIMEOUT;
+            
+            //Seconds -> ms
+            Long msTimout=new Long(timeout*1000);
+            
             //Create a native runner and execute Balloon with it for a certain timeout
             //writing from inputfile to outputfile with desired number of conformations
-            BalloonRunner runner=new BalloonRunner(new Long(60000));
+            BalloonRunner runner=new BalloonRunner(msTimout);
             boolean status=runner.runBalloon( infile,outfile,
                                                  numConformations );
             if (!status){

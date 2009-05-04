@@ -10,7 +10,13 @@
       </scriptContribution>
    </extension>
 
-
+<extension point="org.eclipse.ui.preferencePages">
+ 	<page id="net.bioclipse.balloon.prefs"
+ 		name="Balloon"
+    	class="net.bioclipse.balloon.ui.BallonPreferencePage">
+   	</page>
+   	
+</extension>
 
    <extension
          point="org.eclipse.ui.menus">
