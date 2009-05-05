@@ -12,6 +12,7 @@ package net.bioclipse.balloon.business;
 
 import java.util.List;
 
+import net.bioclipse.core.PublishedClass;
 import net.bioclipse.core.PublishedMethod;
 import net.bioclipse.core.Recorded;
 import net.bioclipse.core.business.BioclipseException;
@@ -25,6 +26,7 @@ import net.bioclipse.core.business.IBioclipseManager;
  * @author ola
  *
  */
+@PublishedClass("Controls access to Balloon, a 3D atomic coordinates library.")
 public interface IBalloonManager extends IBioclipseManager {
 
     /**
