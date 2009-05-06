@@ -19,6 +19,7 @@ import net.bioclipse.core.business.BioclipseException;
 import net.bioclipse.core.business.IBioclipseManager;
 
 
+@PublishedClass( "Contains methods related to Balloon")
 /**
  * An interface for a Bioclipse Manager for invoking Balloon
  * (http://web.abo.fi/~mivainio/balloon/index.php)
@@ -26,7 +27,6 @@ import net.bioclipse.core.business.IBioclipseManager;
  * @author ola
  *
  */
-@PublishedClass("Controls access to Balloon, a 3D atomic coordinates library.")
 public interface IBalloonManager extends IBioclipseManager {
 
     /**

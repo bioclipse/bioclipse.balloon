@@ -21,14 +21,11 @@ import java.util.concurrent.TimeoutException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.swt.widgets.Display;
 
 import net.bioclipse.balloon.runner.BalloonRunner;
 import net.bioclipse.cdk.business.ICDKManager;
