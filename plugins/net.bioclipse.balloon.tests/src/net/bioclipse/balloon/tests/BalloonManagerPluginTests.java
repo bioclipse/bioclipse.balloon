@@ -41,7 +41,7 @@ public class BalloonManagerPluginTests {
     public void testGenerate3DonAbsoluteFile() throws URISyntaxException, MalformedURLException, IOException, BioclipseException, CDKException, CoreException{
         
         IBalloonManager ballon = Activator.getDefault().getBalloonManager();
-        ICDKManager cdk = net.bioclipse.cdk.business.Activator.getDefault().getCDKManager();
+        ICDKManager cdk = net.bioclipse.cdk.business.Activator.getDefault().getJavaCDKManager();
         
         URI uri = getClass().getResource("/testFiles/polycarpol.mol").toURI();
         URL url=FileLocator.toFileURL(uri.toURL());
@@ -75,7 +75,7 @@ public class BalloonManagerPluginTests {
     public void testGenerate3DonCML() throws URISyntaxException, MalformedURLException, IOException, BioclipseException, CDKException, CoreException{
         
         IBalloonManager ballon = Activator.getDefault().getBalloonManager();
-        ICDKManager cdk = net.bioclipse.cdk.business.Activator.getDefault().getCDKManager();
+        ICDKManager cdk = net.bioclipse.cdk.business.Activator.getDefault().getJavaCDKManager();
         
         URI uri = getClass().getResource("/testFiles/0037.cml").toURI();
         URL url=FileLocator.toFileURL(uri.toURL());
@@ -110,7 +110,7 @@ public class BalloonManagerPluginTests {
     public void testGenerate3DonSDF() throws URISyntaxException, MalformedURLException, IOException, BioclipseException, CDKException, CoreException{
         
         IBalloonManager ballon = Activator.getDefault().getBalloonManager();
-        ICDKManager cdk = net.bioclipse.cdk.business.Activator.getDefault().getCDKManager();
+        ICDKManager cdk = net.bioclipse.cdk.business.Activator.getDefault().getJavaCDKManager();
         
         URI uri = getClass().getResource("/testFiles/Fragments2.sdf").toURI();
         URL url=FileLocator.toFileURL(uri.toURL());
@@ -152,7 +152,7 @@ public class BalloonManagerPluginTests {
     public void testGenerate3DonSmiles() throws URISyntaxException, MalformedURLException, IOException, BioclipseException, CDKException, CoreException{
         
         IBalloonManager ballon = Activator.getDefault().getBalloonManager();
-        ICDKManager cdk = net.bioclipse.cdk.business.Activator.getDefault().getCDKManager();
+        ICDKManager cdk = net.bioclipse.cdk.business.Activator.getDefault().getJavaCDKManager();
         
       URI uri = getClass().getResource("/testFiles/sample30.smi").toURI();
       URL url=FileLocator.toFileURL(uri.toURL());
