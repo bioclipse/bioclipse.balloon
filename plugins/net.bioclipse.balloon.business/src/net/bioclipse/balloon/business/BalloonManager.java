@@ -172,7 +172,7 @@ public class BalloonManager implements IBalloonManager {
                 getJavaCDKManager();
             
             try {
-                ICDKMolecule cdkmol = cdk.loadMolecule( inIfile, new NullProgressMonitor() );
+                ICDKMolecule cdkmol = cdk.loadMolecule( inIfile );
                 File f = File.createTempFile("balloon", ".mdl");
 
                 //Write mol as MDL to the temp file
