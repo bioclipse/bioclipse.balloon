@@ -50,7 +50,7 @@ public class BalloonManagerPluginTests {
         IFile molfile = ResourcePathTransformer.getInstance().transform( path );
         
 //        ICDKMolecule mol  = cdk.loadMolecule( path );
-        ICDKMolecule mol  = cdk.loadMolecule( molfile, new NullProgressMonitor() );
+        ICDKMolecule mol  = cdk.loadMolecule( molfile );
         assertTrue( cdk.has2d( mol ));
         assertFalse( cdk.has3d( mol ));
 
@@ -65,7 +65,7 @@ public class BalloonManagerPluginTests {
         
 //        ICDKMolecule mol2 = cdk.loadMolecule(res);
         IFile molfile2 = ResourcePathTransformer.getInstance().transform( res );
-        ICDKMolecule mol2  = cdk.loadMolecule( molfile2, new NullProgressMonitor() );
+        ICDKMolecule mol2  = cdk.loadMolecule( molfile2 );
 
         assertTrue( cdk.has3d( mol2 ));
         assertFalse( cdk.has2d( mol2 ));
@@ -84,7 +84,7 @@ public class BalloonManagerPluginTests {
         IFile molfile = ResourcePathTransformer.getInstance().transform( path );
         
 //        ICDKMolecule mol  = cdk.loadMolecule( path );
-        ICDKMolecule mol  = cdk.loadMolecule( molfile, new NullProgressMonitor() );
+        ICDKMolecule mol  = cdk.loadMolecule( molfile );
         assertTrue( cdk.has2d( mol ));
         assertFalse( cdk.has3d( mol ));
 
@@ -99,7 +99,7 @@ public class BalloonManagerPluginTests {
         
 //        ICDKMolecule mol2 = cdk.loadMolecule(res);
         IFile molfile2 = ResourcePathTransformer.getInstance().transform( res );
-        ICDKMolecule mol2  = cdk.loadMolecule( molfile2, new NullProgressMonitor() );
+        ICDKMolecule mol2  = cdk.loadMolecule( molfile2 );
 
         assertTrue( cdk.has3d( mol2 ));
         assertFalse( cdk.has2d( mol2 ));
@@ -119,7 +119,7 @@ public class BalloonManagerPluginTests {
         IFile molfile = ResourcePathTransformer.getInstance().transform( path );
         
 //        ICDKMolecule mol  = cdk.loadMolecule( path );
-        List<ICDKMolecule> mols  = cdk.loadMolecules( molfile, new NullProgressMonitor() );
+        List<ICDKMolecule> mols  = cdk.loadMolecules( molfile );
         System.out.println("SDF contained: " + mols.size() + " mols");
         for ( ICDKMolecule mol : mols ) {
             assertTrue( cdk.has2d( mol ));
@@ -138,7 +138,7 @@ public class BalloonManagerPluginTests {
 
 //        ICDKMolecule mol2 = cdk.loadMolecule(res);
         IFile molfile2 = ResourcePathTransformer.getInstance().transform( res );
-        List<ICDKMolecule> mols2  = cdk.loadMolecules( molfile2, new NullProgressMonitor() );
+        List<ICDKMolecule> mols2  = cdk.loadMolecules( molfile2 );
         System.out.println("Returned SDF contained: " + mols2.size() + " mols");
         for ( ICDKMolecule mol2 : mols2 ) {
             assertTrue( cdk.has3d( mol2 ));
@@ -160,7 +160,7 @@ public class BalloonManagerPluginTests {
       
       IFile molfile = ResourcePathTransformer.getInstance().transform( path );
       
-      List<ICDKMolecule> mols  = cdk.loadSMILESFile( molfile, new NullProgressMonitor());
+      List<ICDKMolecule> mols  = cdk.loadSMILESFile( molfile );
         System.out.println("Input SMILES file contained: " + mols.size() + " mols");
         for ( ICDKMolecule mol : mols ) {
             assertFalse( cdk.has2d( mol ));
@@ -179,7 +179,7 @@ public class BalloonManagerPluginTests {
 
 //        ICDKMolecule mol2 = cdk.loadMolecule(res);
         IFile molfile2 = ResourcePathTransformer.getInstance().transform( res );
-        List<ICDKMolecule> mols2  = cdk.loadMolecules( molfile2, new NullProgressMonitor() );
+        List<ICDKMolecule> mols2  = cdk.loadMolecules( molfile2 );
         System.out.println("Returned SDF contained: " + mols2.size() + " mols");
         for ( ICDKMolecule mol2 : mols2 ) {
             assertTrue( cdk.has3d( mol2 ));
