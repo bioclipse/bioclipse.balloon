@@ -169,7 +169,7 @@ public class BalloonManager implements IBalloonManager {
             logger.debug("File is CML, serialize to temp file as MDL");
 
             ICDKManager cdk=net.bioclipse.cdk.business.Activator.getDefault().
-                getCDKManager();
+                getJavaCDKManager();
             
             try {
                 ICDKMolecule cdkmol = cdk.loadMolecule( inIfile, new NullProgressMonitor() );
