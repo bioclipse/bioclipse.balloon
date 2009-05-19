@@ -2,9 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Balloon Mac OS X
 Bundle-SymbolicName: net.bioclipse.balloon.macosx
-Bundle-Version: 2.0.0.B20090515
+Bundle-Version: 2.0.0.B20090519
 Bundle-Vendor: The Bioclipse Team
-Fragment-Host: net.bioclipse.balloon;bundle-version="2.0.0.B20090515"
+Fragment-Host: net.bioclipse.balloon;bundle-version="2.0.0.B20090519"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: net.bioclipse.balloon.runner
 Bundle-ClassPath: .
