@@ -2,7 +2,7 @@
 <feature
       id="net.bioclipse.balloon_feature"
       label="Balloon_feature Feature"
-      version="2.0.0.B20090519"
+      version="2.0.0.B20090520"
       provider-name="The Bioclispe Team"
       plugin="net.bioclipse.balloon.business">
 
@@ -31,8 +31,8 @@ The Eclipse Public License accompanies this distribution, and is available at ht
    </url>
 
    <requires>
-      <import feature="net.bioclipse.chemoinformatics_feature" version="2.0.0.B20090519" match="greaterOrEqual"/>
-      <import feature="net.bioclipse.core.patch" version="2.0.0.B20090519" match="greaterOrEqual"/>
+      <import feature="net.bioclipse.chemoinformatics_feature" version="2.0.0.B20090520" match="greaterOrEqual"/>
+      <import feature="net.bioclipse.core.patch" version="2.0.0.B20090520" match="greaterOrEqual"/>
    </requires>
 
    <plugin
