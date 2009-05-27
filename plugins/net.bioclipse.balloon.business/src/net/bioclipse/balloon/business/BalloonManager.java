@@ -56,7 +56,7 @@ public class BalloonManager implements IBalloonManager {
      * Defines the Bioclipse namespace for balloon.
      * Appears in the scripting language as the namespace/prefix
      */
-    public String getNamespace() {
+    public String getManagerName() {
         return "balloon";
     }
 
