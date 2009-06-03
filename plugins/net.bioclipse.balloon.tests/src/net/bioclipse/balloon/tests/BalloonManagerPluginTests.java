@@ -38,10 +38,11 @@ import org.openscience.cdk.exception.CDKException;
 public class BalloonManagerPluginTests {
 
     @Test
-    public void testGenerate3DonAbsoluteFile() throws URISyntaxException, MalformedURLException, IOException, BioclipseException, CDKException, CoreException{
+    public void testGenerate3DonAbsoluteFile() throws Exception {
         
-        IBalloonManager ballon = Activator.getDefault().getBalloonManager();
-        ICDKManager cdk = net.bioclipse.cdk.business.Activator.getDefault().getJavaCDKManager();
+        IBalloonManager ballon = Activator.getDefault().getJavaBalloonManager();
+        ICDKManager cdk = net.bioclipse.cdk.business.Activator
+                             .getDefault().getJavaCDKManager();
         
         URI uri = getClass().getResource("/testFiles/polycarpol.mol").toURI();
         URL url=FileLocator.toFileURL(uri.toURL());
@@ -72,10 +73,11 @@ public class BalloonManagerPluginTests {
     }
 
     @Test
-    public void testGenerate3DonCML() throws URISyntaxException, MalformedURLException, IOException, BioclipseException, CDKException, CoreException{
+    public void testGenerate3DonCML() throws Exception {
         
-        IBalloonManager ballon = Activator.getDefault().getBalloonManager();
-        ICDKManager cdk = net.bioclipse.cdk.business.Activator.getDefault().getJavaCDKManager();
+        IBalloonManager ballon = Activator.getDefault().getJavaBalloonManager();
+        ICDKManager cdk = net.bioclipse.cdk.business.Activator
+                             .getDefault().getJavaCDKManager();
         
         URI uri = getClass().getResource("/testFiles/0037.cml").toURI();
         URL url=FileLocator.toFileURL(uri.toURL());
@@ -107,10 +109,11 @@ public class BalloonManagerPluginTests {
     }
     
     @Test
-    public void testGenerate3DonSDF() throws URISyntaxException, MalformedURLException, IOException, BioclipseException, CDKException, CoreException{
+    public void testGenerate3DonSDF() throws Exception {
         
-        IBalloonManager ballon = Activator.getDefault().getBalloonManager();
-        ICDKManager cdk = net.bioclipse.cdk.business.Activator.getDefault().getJavaCDKManager();
+        IBalloonManager ballon = Activator.getDefault().getJavaBalloonManager();
+        ICDKManager cdk = net.bioclipse.cdk.business.Activator
+                             .getDefault().getJavaCDKManager();
         
         URI uri = getClass().getResource("/testFiles/Fragments2.sdf").toURI();
         URL url=FileLocator.toFileURL(uri.toURL());
@@ -149,10 +152,11 @@ public class BalloonManagerPluginTests {
     }
 
     @Test
-    public void testGenerate3DonSmiles() throws URISyntaxException, MalformedURLException, IOException, BioclipseException, CDKException, CoreException{
+    public void testGenerate3DonSmiles() throws Exception {
         
-        IBalloonManager ballon = Activator.getDefault().getBalloonManager();
-        ICDKManager cdk = net.bioclipse.cdk.business.Activator.getDefault().getJavaCDKManager();
+        IBalloonManager ballon = Activator.getDefault().getJavaBalloonManager();
+        ICDKManager cdk = net.bioclipse.cdk.business.Activator
+                             .getDefault().getJavaCDKManager();
         
       URI uri = getClass().getResource("/testFiles/sample30.smi").toURI();
       URL url=FileLocator.toFileURL(uri.toURL());
@@ -161,7 +165,8 @@ public class BalloonManagerPluginTests {
       IFile molfile = ResourcePathTransformer.getInstance().transform( path );
       
       List<ICDKMolecule> mols  = cdk.loadSMILESFile( molfile );
-        System.out.println("Input SMILES file contained: " + mols.size() + " mols");
+        System.out.println( "Input SMILES file contained: " 
+                            + mols.size() + " mols" );
         for ( ICDKMolecule mol : mols ) {
             assertFalse( cdk.has2d( mol ));
             assertFalse( cdk.has3d( mol ));
@@ -185,9 +190,5 @@ public class BalloonManagerPluginTests {
             assertTrue( cdk.has3d( mol2 ));
             assertFalse( cdk.has2d( mol2 ));
         }
-
-
     }
-    
-
 }
