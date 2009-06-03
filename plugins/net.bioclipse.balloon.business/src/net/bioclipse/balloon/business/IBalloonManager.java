@@ -38,10 +38,10 @@ public interface IBalloonManager extends IBioclipseManager {
      */
     @Recorded
     @PublishedMethod(
-                     params="String inputfile",
-                     methodSummary="Generated 3D coodrinates for all molecules " +
-                     "in the inputfile. Creates a default output file." +
-    "Inputs: inputfile = path to inputfile.")
+        params = "String inputfile",
+        methodSummary = "Generated 3D coodrinates for all molecules in the " +
+        		            "inputfile. Creates a default output file. Inputs: " +
+        		            "inputfile = path to inputfile.")
     String generate3Dcoordinates( String inputfile ) throws BioclipseException;
 
     /**
@@ -54,14 +54,13 @@ public interface IBalloonManager extends IBioclipseManager {
      * @throws BioclipseException 
      */
     @PublishedMethod(
-                     params="String inputfile, String outputfile",
-                     methodSummary="Generated 3D coodrinates for all molecules " +
-                     "in the inputfile and saves to outputfile " +
-                     "Inputs: inputfile = path to inputfile, " +
-    "outputfile = path to outputfile")
+        params = "String inputfile, String outputfile",
+        methodSummary = "Generated 3D coodrinates for all molecules in the " +
+        		            "inputfile and saves to outputfile Inputs: inputfile " +
+        		            "= path to inputfile, outputfile = path to outputfile")
     @Recorded
-    String generate3Dcoordinates( String inputfile, String outputfile ) throws BioclipseException;
-
+    String generate3Dcoordinates( String inputfile, String outputfile ) 
+           throws BioclipseException;
 
     /**
      * Generate 3D conformations for one or more inputfiles in a list.
@@ -70,12 +69,14 @@ public interface IBalloonManager extends IBioclipseManager {
      * @throws BioclipseException 
      */
     @PublishedMethod(
-                     params="List<String> inputfiles",
-                     methodSummary="Generate 3D coordinates for all molecules " +
-                     "in a list of inputfiles. Creates a default output file." +
-    "Inputs: inputfiles = list of Strings with paths to inputfiles")
+        params = "List<String> inputfiles",
+        methodSummary = "Generate 3D coordinates for all molecules in a list " +
+        		            "of inputfiles. Creates a default output file. " +
+        		            "Inputs: inputfiles = list of Strings with paths " +
+        		            "to inputfiles" )
     @Recorded
-    List<String> generate3Dcoordinates( List<String> inputfiles) throws BioclipseException;
+    List<String> generate3Dcoordinates( List<String> inputfiles) 
+                 throws BioclipseException;
 
     /**
      * Generate 3D conformations for one or more inputfiles in a list.
@@ -85,13 +86,15 @@ public interface IBalloonManager extends IBioclipseManager {
      * @throws BioclipseException 
      */
     @PublishedMethod(
-                     params="List<String> inputfiles, int numConformations",
-                     methodSummary="Generate 3D conformations for all molecules " +
-                     "in a list of inputfiles. " +
-                     "inputfiles = list of Strings with paths to inputfiles, " +
-    "numConformations = number of conformations to generate per molecule.")
+        params = "List<String> inputfiles, int numConformations",
+        methodSummary = "Generate 3D conformations for all molecules in a " +
+        		            "list of inputfiles. inputfiles = list of Strings " +
+        		            "with paths to inputfiles, numConformations = number " +
+        		            "of conformations to generate per molecule." )
     @Recorded
-    List<String> generate3Dconformations( List<String> inputfiles, int numConformations) throws BioclipseException;
+    List<String> generate3Dconformations( List<String> inputfiles, 
+                                          int numConformations) 
+                 throws BioclipseException;
 
     /**
      * Generate 3D conformations for an inputfile
@@ -101,13 +104,14 @@ public interface IBalloonManager extends IBioclipseManager {
      * @throws BioclipseException 
      */
     @PublishedMethod(
-                     params="String inputfile, int numConformations",
-                     methodSummary="Generate 3D conformations for all molecules " +
-                     "in an inputfile. Creates a default output filename. " +
-                     "inputfile = paths to inputfile, " +
-    "numConformations = number of conformations to generate per molecule.")
+        params = "String inputfile, int numConformations",
+        methodSummary = "Generate 3D conformations for all molecules in an " +
+        		            "inputfile. Creates a default output filename. " +
+        		            "inputfile = paths to inputfile, numConformations " +
+        		            "= number of conformations to generate per molecule." )
     @Recorded
-    String generate3Dconformations( String inputfile, int numConformations ) throws BioclipseException;
+    String generate3Dconformations( String inputfile, int numConformations ) 
+           throws BioclipseException;
 
     /**
      * Generate 3D conformations for an inputfile to a dedicated outputfile
@@ -120,14 +124,15 @@ public interface IBalloonManager extends IBioclipseManager {
      * @throws BioclipseException 
      */
     @PublishedMethod(
-                     params="String inputfile, String outputfile, int numConformations",
-                     methodSummary="Generated 3D conformations for all molecules " +
-                     "in the inputfile. \n" +
-                     "Inputs: inputfile = path to inputfile, " +
-                     "outputfile = path to outputfile, " +
-    "numConformations = number of conformations to generate per molecule.")
+        params = "String inputfile, String outputfile, int numConformations",
+        methodSummary = "Generated 3D conformations for all molecules " +
+                        "in the inputfile. \n" +
+                        "Inputs: inputfile = path to inputfile, outputfile " +
+                        "= path to outputfile, numConformations = number of " +
+                        "conformations to generate per molecule.")
     @Recorded
-    String generate3Dconformations( String inputfile, String outputfile, 
-                                    int numConformations ) throws BioclipseException;
-
+    String generate3Dconformations( String inputfile, 
+                                    String outputfile, 
+                                    int numConformations ) 
+           throws BioclipseException;
 }
