@@ -38,8 +38,9 @@ public class Activator extends AbstractUIPlugin {
     //Default timeout is 1 minute
     public static final int DEFAULT_BALLOON_TIMEOUT = 60;
 
-    private ServiceTracker finderTracker;
-
+    private ServiceTracker javaScriptFinderTracker;
+    private ServiceTracker javaFinderTracker;
+    
     /**
      * The constructor
      */
@@ -54,10 +55,17 @@ public class Activator extends AbstractUIPlugin {
         super.start(context);
         plugin = this;
 
-        finderTracker = new ServiceTracker( context, 
-                                            IBalloonManager.class.getName(), 
-                                            null );
-        finderTracker.open();
+        javaScriptFinderTracker 
+            = new ServiceTracker( context, 
+                                  IJavaScriptBalloonManager.class.getName(), 
+                                  null );
+        javaScriptFinderTracker.open();
+        
+        javaFinderTracker 
+            = new ServiceTracker( context, 
+                                  IJavaBalloonManager.class.getName(), 
+                                  null );
+        javaFinderTracker.open();
         
         getPreferenceStore().setDefault(BALLOON_TIMEOUT, DEFAULT_BALLOON_TIMEOUT);
 
@@ -92,16 +100,34 @@ public class Activator extends AbstractUIPlugin {
         return imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
 
-    public IBalloonManager getBalloonManager() {
+    public IBalloonManager getJavaBalloonManager() {
         IBalloonManager manager = null;
         try {
-            manager = (IBalloonManager) finderTracker.waitForService(1000*10);
+            manager = (IBalloonManager) 
+                      javaFinderTracker.waitForService(1000*10);
         } catch (InterruptedException e) {
-            logger.warn("Exception occurred while attempting to get the BalloonManager" + e);
-            LogUtils.debugTrace(logger, e);
+            logger.error("Exception occurred while attempting to " +
+            		        "get the BalloonManager", e);
         }
         if(manager == null) {
-            throw new IllegalStateException("Could not get the balloon manager");
+            throw new IllegalStateException(
+                          "Could not get the java balloon manager");
+        }
+        return manager;
+    }
+    
+    public IBalloonManager getJavaScriptBalloonManager() {
+        IBalloonManager manager = null;
+        try {
+            manager = (IBalloonManager) 
+                      javaScriptFinderTracker.waitForService(1000*10);
+        } catch (InterruptedException e) {
+            logger.error("Exception occurred while attempting to " +
+                        "get the JavaScript BalloonManager", e);
+        }
+        if (manager == null) {
+            throw new IllegalStateException(
+                          "Could not get the java balloon manager");
         }
         return manager;
     }
@@ -112,8 +138,7 @@ public class Activator extends AbstractUIPlugin {
      */
     protected void initializeDefaultPreferences(IPreferenceStore store) {
         store.setDefault(BALLOON_TIMEOUT, DEFAULT_BALLOON_TIMEOUT);
-        logger.debug("Default balloon preferences set timeout: " + DEFAULT_BALLOON_TIMEOUT);
+        logger.debug( "Default balloon preferences set timeout: " 
+                      + DEFAULT_BALLOON_TIMEOUT );
     }
-
-
 }

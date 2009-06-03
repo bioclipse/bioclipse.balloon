@@ -30,7 +30,7 @@ public class BalloonManagerFactory implements IExecutableExtension,
     public void setInitializationData(IConfigurationElement config,
             String propertyName, Object data) throws CoreException {
         
-        balloonManager = Activator.getDefault().getBalloonManager();
+        balloonManager = Activator.getDefault().getJavaScriptBalloonManager();
         if(balloonManager==null) {
             balloonManager = new Object();
         }

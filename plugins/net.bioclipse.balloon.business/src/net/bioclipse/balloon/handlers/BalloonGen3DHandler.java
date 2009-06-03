@@ -89,7 +89,7 @@ public class BalloonGen3DHandler extends AbstractHandler {
                 monitor.worked( 1 );
                 
                 //Run balloon on the files
-                IBalloonManager balloon = Activator.getDefault().getBalloonManager();
+                IBalloonManager balloon = Activator.getDefault().getJavaBalloonManager();
                 List<String> ret=null;
                 try {
                     ret = balloon.generate3Dcoordinates( final_fnames);
