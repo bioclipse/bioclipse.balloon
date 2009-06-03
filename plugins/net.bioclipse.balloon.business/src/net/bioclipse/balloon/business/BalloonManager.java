@@ -48,7 +48,8 @@ import net.bioclipse.ui.business.IUIManager;
  */
 public class BalloonManager implements IBalloonManager {
 
-    private static final Logger logger =Logger.getLogger( BalloonManager.class );
+    private static final Logger logger 
+        = Logger.getLogger( BalloonManager.class );
 
     private static List<String> supportedContentTypes;
     
@@ -64,28 +65,33 @@ public class BalloonManager implements IBalloonManager {
     /**
      * Generate 3D for a single file
      */
-    public String generate3Dcoordinates( String inputfile ) throws BioclipseException {
+    public String generate3Dcoordinates( String inputfile ) 
+                  throws BioclipseException {
         return generate3Dconformations( inputfile, 1 );
     }
 
     /**
      * Generate 3D for a list of files
      */
-    public List<String> generate3Dcoordinates( List<String> inputfiles ) throws BioclipseException {
+    public List<String> generate3Dcoordinates( List<String> inputfiles ) 
+                        throws BioclipseException {
         return generate3Dconformations( inputfiles, 1 );
     }
 
     /**
      * Generate 3D for a single file with ouput file specified
      */
-    public String generate3Dcoordinates( String inputfile, String outputfile ) throws BioclipseException {
+    public String generate3Dcoordinates( String inputfile, String outputfile ) 
+                  throws BioclipseException {
         return generate3Dconformations( inputfile, outputfile, 1 );
     }
 
     /**
      * Generate n 3D conformations for a single file
      */
-    public String generate3Dconformations( String inputfile , int numConformations) throws BioclipseException {
+    public String generate3Dconformations( String inputfile, 
+                                           int numConformations) 
+                  throws BioclipseException {
         return generate3Dconformations( inputfile, null,numConformations );
     }
 
@@ -93,11 +99,13 @@ public class BalloonManager implements IBalloonManager {
      * Generate n 3D conformations for a list of files
      */
     public List<String> generate3Dconformations( List<String> inputfiles,
-                                                 int numConformations ) throws BioclipseException {
+                                                 int numConformations ) 
+                        throws BioclipseException {
 
           List<String> outputfiles = new ArrayList<String>();
           for ( String inputfile : inputfiles ) {
-              String ret = generate3Dconformations( inputfile , numConformations);
+              String ret = generate3Dconformations( inputfile, 
+                                                    numConformations);
               outputfiles.add( ret );
           }
           return outputfiles;
@@ -111,8 +119,10 @@ public class BalloonManager implements IBalloonManager {
      * @param outputfile Outputfile to write, will be SDF if more than one mol
      * @param numConformations Number of conformations to generate
      */
-    public String generate3Dconformations( String inputfile, String outputfile,
-                                           int numConformations ) throws BioclipseException {
+    public String generate3Dconformations( String inputfile, 
+                                           String outputfile,
+                                           int numConformations ) 
+                  throws BioclipseException {
         
         if (supportedContentTypes==null)
             fillSupportedContentTypes();
@@ -122,8 +132,9 @@ public class BalloonManager implements IBalloonManager {
             throw new IllegalArgumentException("Outputfile must be different " +
             		"from inputfile for Balloon ");
         
-        IFile inIfile=ResourcePathTransformer.getInstance().transform( inputfile );
-        String infile=inIfile.getRawLocation().toOSString();
+        IFile inIfile = ResourcePathTransformer.getInstance()
+                                               .transform( inputfile );
+        String infile = inIfile.getRawLocation().toOSString();
 
         IContentDescription condesc=null;
         try {
@@ -135,8 +146,8 @@ public class BalloonManager implements IBalloonManager {
 
         if (condesc==null)
             throw new BioclipseException("The file " + inputfile + 
-                                         " has no contenttype and is hence not " +
-                                         "supported for ballloon"); 
+                                         " has no contenttype and is hence " +
+                                         "not supported for ballloon"); 
             
         //Verify content types
         if (!isSupportedContenttype(condesc))
@@ -155,7 +166,8 @@ public class BalloonManager implements IBalloonManager {
             outfile=constructOutputFilename( infile, numConformations );
             containerToRefresh=inIfile.getParent();
         }else{
-            IFile outIfile=ResourcePathTransformer.getInstance().transform( outputfile );
+            IFile outIfile = ResourcePathTransformer.getInstance()
+                                                    .transform( outputfile );
             outfile=outIfile.getRawLocation().toOSString();
             containerToRefresh=outIfile.getParent();
         }
@@ -192,38 +204,50 @@ public class BalloonManager implements IBalloonManager {
         }
 
 
-        logger.debug( "Infile transformed to: " + infile);
-        logger.debug( "Outfile transformed to: " + outfile);
-        logger.debug( "Parent folder to refresh: " + containerToRefresh.getName());
+        logger.debug( "Infile transformed to: " + infile );
+        logger.debug( "Outfile transformed to: " + outfile );
+        logger.debug( "Parent folder to refresh: " 
+                      + containerToRefresh.getName() );
         
         try {
 
             //Read timeout from prefs
-            int timeout=Activator.getDefault().getPreferenceStore().getInt( net.bioclipse.balloon.business.Activator.BALLOON_TIMEOUT );
+            int timeout 
+                = Activator.getDefault().getPreferenceStore()
+                           .getInt( net.bioclipse.balloon.business
+                                       .Activator.BALLOON_TIMEOUT );
 
             //Just to be sure...
             if (timeout<=0)
-                timeout=net.bioclipse.balloon.business.Activator.DEFAULT_BALLOON_TIMEOUT;
+                timeout = net.bioclipse.balloon.business
+                             .Activator.DEFAULT_BALLOON_TIMEOUT;
             
             //Seconds -> ms
             Long msTimout=new Long(timeout*1000);
             
-            //Create a native runner and execute Balloon with it for a certain timeout
-            //writing from inputfile to outputfile with desired number of conformations
+            //Create a native runner and execute Balloon with it for a 
+            //certain timeout writing from inputfile to outputfile with 
+            //desired number of conformations
             BalloonRunner runner=new BalloonRunner(msTimout);
             boolean status=runner.runBalloon( infile,outfile,
                                                  numConformations );
             if (!status){
-                throw new BioclipseException("Balloon execution failed. Native BalloonRunner returned false." );
+                throw new BioclipseException(
+                              "Balloon execution failed. Native " +
+                              "BalloonRunner returned false." );
             }
         } catch ( ExecutionException e ) {
-            throw new BioclipseException("Balloon execution failed. Reason: " + e.getMessage());
+            throw new BioclipseException( "Balloon execution failed. Reason: " 
+                                          + e.getMessage() );
         } catch ( InterruptedException e ) {
-            throw new BioclipseException("Balloon Was interrupted. Reason: " + e.getMessage());
+            throw new BioclipseException( "Balloon Was interrupted. Reason: " 
+                                          + e.getMessage() );
         } catch ( TimeoutException e ) {
-            throw new BioclipseException("Balloon timed out. Reason: " + e.getMessage());
+            throw new BioclipseException( "Balloon timed out. Reason: " 
+                                          + e.getMessage() );
         } catch ( IOException e ) {
-            throw new BioclipseException("Balloon I/O error. Reason: " + e.getMessage());
+            throw new BioclipseException( "Balloon I/O error. Reason: " 
+                                          + e.getMessage() );
         }
         
         logger.debug("Balloon run successful, wrote file: " + outfile);
@@ -250,7 +274,8 @@ public class BalloonManager implements IBalloonManager {
         supportedContentTypes.add( "net.bioclipse.contenttypes.smi" );
         supportedContentTypes.add( "net.bioclipse.contenttypes.sdf" );
         supportedContentTypes.add( "net.bioclipse.contenttypes.mdlMolFile" );
-        supportedContentTypes.add( "net.bioclipse.contenttypes.cml.singleMolecule2d" );
+        supportedContentTypes.add( 
+            "net.bioclipse.contenttypes.cml.singleMolecule2d" );
         
     }
 
@@ -261,7 +286,8 @@ public class BalloonManager implements IBalloonManager {
             IContentType testType = Platform.getContentTypeManager()
                 .getContentType( supCon );
             
-            if (testType!=null && condesc.getContentType().isKindOf( testType ))
+            if ( testType != null && 
+                 condesc.getContentType().isKindOf( testType ) )
                 return true;
             
         }
@@ -276,26 +302,29 @@ public class BalloonManager implements IBalloonManager {
      * @param numConformations
      * @return
      */
-    private String constructOutputFilename(String inputfile, int numConformations){
+    private String constructOutputFilename( String inputfile, 
+                                            int numConformations ) {
 
-        int lastpathsep=inputfile.lastIndexOf( File.separator );
-        String path=inputfile.substring( 0, lastpathsep );
-        String name=inputfile.substring( lastpathsep+1, inputfile.length()-4 );
-        String currentExtension=inputfile.substring( inputfile.length()-4, inputfile.length() );
+        int lastpathsep = inputfile.lastIndexOf( File.separator );
+        String path = inputfile.substring( 0, lastpathsep );
+        String name = inputfile.substring( lastpathsep + 1, 
+                                           inputfile.length() - 4 );
+        String currentExtension = inputfile.substring( inputfile.length() - 4, 
+                                                       inputfile.length() );
 
-        String ext="";
-        if (numConformations>1) ext=".sdf";
-        else ext=currentExtension;
+        String ext = "";
+        if (numConformations>1) ext = ".sdf";
+        else ext = currentExtension;
 
-        String pathfile=path + File.separator + name;
+        String pathfile = path + File.separator + name;
 
-        int cnt=1;
-        String outfile=getAFilename( pathfile, ext, cnt );
-        File file=new File(outfile);
-        while(file.exists()){
+        int cnt = 1;
+        String outfile = getAFilename( pathfile, ext, cnt );
+        File file  =new File(outfile);
+        while (file.exists() ) {
             cnt++;
-            outfile=getAFilename( pathfile, ext, cnt );
-            file=new File(outfile);
+            outfile = getAFilename( pathfile, ext, cnt );
+            file = new File(outfile);
         }
         return outfile;
     }
@@ -307,7 +336,7 @@ public class BalloonManager implements IBalloonManager {
      * @param cnt
      * @return
      */
-    private String getAFilename(String pathname, String ext, int cnt){
+    private String getAFilename(String pathname, String ext, int cnt) {
 
         if (cnt<=1)
             return pathname+"_3d" + ext;
