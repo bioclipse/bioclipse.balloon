@@ -252,11 +252,8 @@ public class BalloonManager implements IBalloonManager {
         
         logger.debug("Balloon run successful, wrote file: " + outfile);
         
+        //Refresh navigator and select the produced file
         ui.refresh(containerToRefresh.getFullPath().toOSString());
-        
-        //FIXME: the following produces a copy in Virtual
-        //Filed as bug 984 dependning on 983
-        //remove comments upon fix
         ui.revealAndSelect( outfile );
 
         return outfile;
@@ -308,12 +305,14 @@ public class BalloonManager implements IBalloonManager {
         String path = inputfile.substring( 0, lastpathsep );
         String name = inputfile.substring( lastpathsep + 1, 
                                            inputfile.length() - 4 );
-        String currentExtension = inputfile.substring( inputfile.length() - 4, 
-                                                       inputfile.length() );
+//        String currentExtension = inputfile.substring( inputfile.length() - 4, 
+//                                                       inputfile.length() );
 
         String ext = "";
         if (numConformations>1) ext = ".sdf";
-        else ext = currentExtension;
+        else ext = ".mdl";
+//        else ext = currentExtension;
+        //TODO: bring this back if we decide to convert back to CML after balloon
 
         String pathfile = path + File.separator + name;
 
