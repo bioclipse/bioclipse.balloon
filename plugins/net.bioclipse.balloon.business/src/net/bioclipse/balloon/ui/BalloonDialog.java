@@ -22,7 +22,8 @@ public class BalloonDialog extends TitleAreaDialog{
 
     private static final String DEFAULT_NUM_CONFORMERS = "15";
 
-    int numConformers;
+    int numConformers = Integer.parseInt( DEFAULT_NUM_CONFORMERS );
+    
     private Text txtNumConf;
 
     public BalloonDialog(Shell parentShell) {
