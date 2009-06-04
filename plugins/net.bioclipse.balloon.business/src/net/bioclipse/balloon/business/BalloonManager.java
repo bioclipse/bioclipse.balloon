@@ -252,8 +252,7 @@ public class BalloonManager implements IBalloonManager {
         
         logger.debug("Balloon run successful, wrote file: " + outfile);
         
-        ui.refresh(containerToRefresh.getFullPath().toOSString(), 
-                   new NullProgressMonitor());
+        ui.refresh(containerToRefresh.getFullPath().toOSString());
         
         //FIXME: the following produces a copy in Virtual
         //Filed as bug 984 dependning on 983
