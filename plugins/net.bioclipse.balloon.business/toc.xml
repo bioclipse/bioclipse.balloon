@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+
+<toc label="Balloon">
+  <topic label="About Balloon" href="html/balloon_about.html"/>
+  <topic label="Balloon in Bioclipse" href="html/balloon.html" />
+</toc>
