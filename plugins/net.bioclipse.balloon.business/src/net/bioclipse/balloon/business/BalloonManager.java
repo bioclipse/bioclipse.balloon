@@ -13,25 +13,33 @@ package net.bioclipse.balloon.business;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
+import org.openscience.cdk.exception.CDKException;
 
 import net.bioclipse.balloon.runner.BalloonRunner;
 import net.bioclipse.cdk.business.ICDKManager;
 import net.bioclipse.cdk.domain.ICDKMolecule;
 import net.bioclipse.core.ResourcePathTransformer;
 import net.bioclipse.core.business.BioclipseException;
+import net.bioclipse.core.domain.IMolecule;
+import net.bioclipse.core.util.LogUtils;
 import net.bioclipse.ui.business.Activator;
 import net.bioclipse.ui.business.IUIManager;
 
@@ -69,6 +77,114 @@ public class BalloonManager implements IBalloonManager {
                   throws BioclipseException {
         return generate3Dconformations( inputfile, 1 );
     }
+
+
+
+    public List<IMolecule> generateMultiple3Dcoordinates(
+                                                    List<IMolecule> molecules )
+                                                    throws BioclipseException {
+
+        return generateMultiple3Dconformations( molecules, 1 );
+    }
+
+    
+    public List<IMolecule> generateMultiple3Dconformations(
+                                                     List<IMolecule> molecules,
+                                                     int numConf )
+                                                     throws BioclipseException {
+        
+        List<IMolecule> retlist=new ArrayList<IMolecule>();
+        
+        for (IMolecule mol : molecules){
+            List<ICDKMolecule> conformations = generate3Dconformations( mol, 
+                                                                      numConf );
+            if (numConf==1)
+                retlist.add( conformations.get( 0 ));
+            else
+                retlist.addAll( conformations);
+        }
+
+       return retlist;
+   }
+    
+    /**
+     * Generate 3D conf for a single molecule
+     */
+    public IMolecule generate3Dcoordinates( IMolecule molecule ) 
+                  throws BioclipseException {
+        
+       return generate3Dconformations( molecule, 1 ).get( 0 );
+    }
+    
+    /**
+     * Generate 3D for a single molecule
+     */
+    public List<ICDKMolecule> generate3Dconformations( IMolecule molecule,
+                                                       int numConf) 
+                  throws BioclipseException {
+        
+        ICDKManager cdk = net.bioclipse.cdk.business.Activator
+                            .getDefault().getJavaCDKManager();
+        
+        IUIManager ui = Activator.getDefault().getUIManager();
+
+        String inputfile=serializeMoleculeToTempFile(molecule);
+        String outputFile = generate3Dconformations( inputfile, numConf );
+        List<ICDKMolecule> retmol=null;
+        try {
+            retmol = cdk.loadMolecules( outputFile);
+        } catch ( Exception e ) {
+            throw new BioclipseException("Could not load output file: " 
+                                         + outputFile);
+        }
+        ui.remove( inputfile);
+        ui.remove( outputFile);
+        for (ICDKMolecule mol : retmol){
+            mol.setResource( null );
+        }
+        return retmol;
+    }
+
+
+
+    /**
+     * Serialize a temp molecule in Virtual and return the absolute path
+     * @param molecule
+     * @return
+     * @throws BioclipseException 
+     */
+    private String serializeMoleculeToTempFile( IMolecule molecule ) 
+    throws BioclipseException {
+
+        ICDKManager cdk = net.bioclipse.cdk.business.Activator
+                            .getDefault().getJavaCDKManager();
+        
+        
+        //Write a temp molfile and return path
+        File tempfile=null;
+        try {
+            tempfile = File.createTempFile("balloon", ".mol");
+
+            //Write mol as MDL to the temp file
+            String mdlString=cdk.getMDLMolfileString( molecule );
+            FileWriter w = new FileWriter(tempfile);
+            w.write( mdlString );
+            w.close();
+
+        } catch ( Exception e ) {
+            throw new BioclipseException("Could not save temp file: " 
+                                         + tempfile + ": " + e.getMessage());
+        }
+
+        String tempPath=tempfile.getAbsolutePath();
+        
+        if (tempPath==null)
+            throw new BioclipseException("Could not save temp file: " 
+                                         + tempPath);
+        
+        return tempPath;
+    }
+
 
     /**
      * Generate 3D for a list of files
@@ -254,7 +370,7 @@ public class BalloonManager implements IBalloonManager {
         
         //Refresh navigator and select the produced file
         ui.refresh(containerToRefresh.getFullPath().toOSString());
-        ui.revealAndSelect( outfile );
+//        ui.revealAndSelect( outfile );
 
         return outfile;
 
@@ -342,5 +458,6 @@ public class BalloonManager implements IBalloonManager {
             return pathname+"_3d_" + cnt + ext;
 
     }
+
 
 }
