@@ -2,9 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ballon Win32
 Bundle-SymbolicName: net.bioclipse.balloon.win32
-Bundle-Version: 2.2.0.RC3
+Bundle-Version: 2.2.0.v20100127
 Bundle-Vendor: The Bioclipse Team
-Fragment-Host: net.bioclipse.balloon;bundle-version="2.2.0.RC3"
+Fragment-Host: net.bioclipse.balloon;bundle-version="2.2.0.v20100127"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: net.bioclipse.balloon.runner
 Import-Package: org.apache.log4j;version="1.2.15"
