@@ -15,4 +15,4 @@ Bundle-ClassPath: jars/jnati-core-0.2-SNAPSHOT.jar,
 Export-Package: net.bioclipse.jnati,
  net.sf.jnati,
  net.sf.jnati.proc
-Import-Package: org.apache.log4j;version="1.2.15"
+Import-Package: org.apache.log4j
