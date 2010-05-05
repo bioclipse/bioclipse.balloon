@@ -8,5 +8,5 @@ Fragment-Host: net.bioclipse.balloon;bundle-version="2.2.0.v20100127"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: net.bioclipse.balloon.runner
 Bundle-ClassPath: .
-Import-Package: org.apache.log4j;version="1.2.15"
+Import-Package: org.apache.log4j
 Require-Bundle: net.bioclipse.jnati;bundle-version="0.2.0"
