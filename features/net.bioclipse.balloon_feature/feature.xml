@@ -2,7 +2,7 @@
 <feature
       id="net.bioclipse.balloon_feature"
       label="Balloon_feature Feature"
-      version="2.4.0.RC1"
+      version="2.4.0.RC2"
       provider-name="The Bioclispe Team"
       plugin="net.bioclipse.balloon.business">
 
