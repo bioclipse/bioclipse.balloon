@@ -120,7 +120,7 @@ public class Activator extends AbstractUIPlugin {
         IBalloonManager manager = null;
         try {
             manager = (IBalloonManager) 
-                      javaScriptFinderTracker.waitForService(1000*10);
+                      javaScriptFinderTracker.waitForService(3000*10);
         } catch (InterruptedException e) {
             logger.error("Exception occurred while attempting to " +
                         "get the JavaScript BalloonManager", e);
