@@ -15,7 +15,7 @@ import java.util.List;
 
 import net.bioclipse.balloon.business.Activator;
 import net.bioclipse.balloon.business.IBalloonManager;
-import net.bioclipse.core.business.BioclipseException;
+import net.bioclipse.core.api.BioclipseException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.commands.AbstractHandler;

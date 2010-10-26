@@ -10,7 +10,7 @@
  ******************************************************************************/
 package net.bioclipse.balloon.business;
 
-import net.bioclipse.managers.business.IBioclipseManager;
+import net.bioclipse.core.api.managers.IBioclipseManager;
 
 
 /**
