@@ -10,9 +10,6 @@
  ******************************************************************************/
 package net.bioclipse.balloon.business;
 
-import net.bioclipse.managers.business.IBioclipseManager;
-
-
 /**
  * @author jonalv
  *

@@ -10,8 +10,6 @@
  ******************************************************************************/
 package net.bioclipse.balloon.business;
 
-import net.bioclipse.core.util.LogUtils;
-
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="net.bioclipse.balloon_feature"
-      label="Balloon_feature Feature"
-      version="2.4.0.20100709"
+      label="Balloon Feature"
+      version="2.5.0.qualifier"
       provider-name="The Bioclispe Team"
       plugin="net.bioclipse.balloon.business">
 
