@@ -35,8 +35,8 @@ public class Activator extends AbstractUIPlugin {
     //Preference string for timeout
     public static final String BALLOON_TIMEOUT = "balloon.timout";
 
-    //Default timeout is 1 minute
-    public static final int DEFAULT_BALLOON_TIMEOUT = 60;
+    //Default timeout is 10 minutes
+    public static final int DEFAULT_BALLOON_TIMEOUT = 60*10;
 
     private ServiceTracker javaScriptFinderTracker;
     private ServiceTracker javaFinderTracker;

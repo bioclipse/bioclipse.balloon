@@ -142,7 +142,7 @@ public class BalloonRunner {
     public BalloonRunner(Long timeoutMs) throws IOException {
 
         if (timeoutMs<=0)
-            this.timeoutMs=20000;
+            this.timeoutMs=600000;
         else
             this.timeoutMs=timeoutMs;
 

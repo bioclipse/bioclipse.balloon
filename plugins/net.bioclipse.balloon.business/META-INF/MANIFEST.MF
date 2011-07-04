@@ -19,7 +19,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.help,
  net.bioclipse.ioformats,
  org.openscience.cdk.ioformats,
- org.openscience.cdk.core
+ org.openscience.cdk.core,
+ org.openscience.cdk.interfaces;bundle-version="1.3.8"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: net.bioclipse.balloon.business

@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -128,21 +129,35 @@ public class BalloonManager implements IBalloonManager {
         
         IUIManager ui = Activator.getDefault().getUIManager();
 
-        String inputfile=serializeMoleculeToTempFile(molecule);
+        //Copy back properties from input mol to retmol
+        ICDKMolecule cdkmol = cdk.asCDKMolecule(molecule);
+        Map<Object, Object> props = cdkmol.getAtomContainer().getProperties();
+
+        String inputfile=serializeMoleculeToTempFile(cdkmol);
         String outputFile = generate3Dconformations( inputfile, numConf );
-        List<ICDKMolecule> retmol=null;
+        
+        List<ICDKMolecule> retmols=null;
         try {
-            retmol = cdk.loadMolecules( outputFile);
+            retmols = cdk.loadMolecules( outputFile);
+
+            for (ICDKMolecule newmol : retmols){
+                for (Object key : props.keySet()){
+                	Object value = props.get(key);
+                	newmol.getAtomContainer().setProperty(key, value);
+                }
+            }
+            	
+            
         } catch ( Exception e ) {
             throw new BioclipseException("Could not load output file: " 
                                          + outputFile);
         }
         ui.remove( inputfile);
         ui.remove( outputFile);
-        for (ICDKMolecule mol : retmol){
+        for (ICDKMolecule mol : retmols){
             mol.setResource( null );
         }
-        return retmol;
+        return retmols;
     }
 
 
