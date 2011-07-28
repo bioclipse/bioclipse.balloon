@@ -73,7 +73,7 @@ The Eclipse Public License accompanies this distribution, and is available at ht
          unpack="false"/>
 
    <plugin
-         id="net.bioclipse.jnati"
+         id="jnati-proc-0.4"
          download-size="0"
          install-size="0"
          version="0.0.0"
