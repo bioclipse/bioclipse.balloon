@@ -26,6 +26,7 @@ import net.bioclipse.cdk.domain.ICDKMolecule;
 import net.bioclipse.core.ResourcePathTransformer;
 import net.bioclipse.core.business.BioclipseException;
 import net.bioclipse.core.domain.IMolecule;
+import net.bioclipse.managers.business.IBioclipseManager;
 import net.bioclipse.ui.business.Activator;
 import net.bioclipse.ui.business.IUIManager;
 
@@ -33,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
@@ -48,7 +50,7 @@ import org.eclipse.core.runtime.content.IContentType;
  * 
  * @author ola
  */
-public class BalloonManager implements IBalloonManager {
+public class BalloonManager implements IBioclipseManager {
 
     private static final Logger logger 
         = Logger.getLogger( BalloonManager.class );
@@ -74,29 +76,44 @@ public class BalloonManager implements IBalloonManager {
 
 
 
-    public List<IMolecule> generateMultiple3Dcoordinates(
-                                                    List<IMolecule> molecules )
+    public List<ICDKMolecule> generateMultiple3Dcoordinates(
+                                                    List<IMolecule> molecules, IProgressMonitor monitor )
                                                     throws BioclipseException {
 
-        return generateMultiple3Dconformations( molecules, 1 );
+        return generateMultiple3Dconformations( molecules, 1, monitor );
     }
 
     
-    public List<IMolecule> generateMultiple3Dconformations(
+    public List<ICDKMolecule> generateMultiple3Dconformations(
                                                      List<IMolecule> molecules,
-                                                     int numConf )
+                                                     int numConf, IProgressMonitor monitor )
                                                      throws BioclipseException {
         
-        List<IMolecule> retlist=new ArrayList<IMolecule>();
+        List<ICDKMolecule> retlist=new ArrayList<ICDKMolecule>();
+        monitor.beginTask("Balloon conformation generation", molecules.size());
         
+        int i=0;
         for (IMolecule mol : molecules){
-            List<ICDKMolecule> conformations = generate3Dconformations( mol, 
-                                                                      numConf );
-            if (numConf==1)
-                retlist.add( conformations.get( 0 ));
-            else
-                retlist.addAll( conformations);
+        	i++;
+
+        	List<ICDKMolecule> conformations;
+			try {
+				conformations = generate3Dconformations( mol,numConf );
+				
+				//We only enforce one conformation for target conf 1
+	            if (numConf==1)
+	                retlist.add( conformations.get( 0 ));
+	            else
+	                retlist.addAll( conformations);
+			} catch (BioclipseException e) {
+				logger.error("Balloon failed on mol " + i + ". Reason: " + e.getMessage());
+			}
+            monitor.worked(1);
+            if (i%5==0)
+            	monitor.subTask("Processed: " + i + "/" + molecules.size() +" molecules");
         }
+        
+        monitor.done();
 
        return retlist;
    }
@@ -104,7 +121,7 @@ public class BalloonManager implements IBalloonManager {
     /**
      * Generate 3D conf for a single molecule
      */
-    public IMolecule generate3Dcoordinates( IMolecule molecule ) 
+    public ICDKMolecule generate3Dcoordinates( IMolecule molecule ) 
                   throws BioclipseException {
         
        return generate3Dconformations( molecule, 1 ).get( 0 );
