@@ -4,7 +4,8 @@
       label="Balloon Feature"
       version="2.5.0.qualifier"
       provider-name="The Bioclispe Team"
-      plugin="net.bioclipse.balloon.business">
+      plugin="net.bioclipse.balloon.business"
+      os="linux,macosx,win32">
 
    <description>
       Balloon provides Bioclipse with features to generate 3D conformations from chemical structures.
@@ -31,7 +32,22 @@ The Eclipse Public License accompanies this distribution, and is available at ht
    </url>
 
    <requires>
-      <import feature="net.bioclipse.chemoinformatics_feature" version="2.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="log4j.over.slf4j"/>
+      <import plugin="net.bioclipse.core"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="net.bioclipse.ui.business" version="2.5.0" match="greaterOrEqual"/>
+      <import plugin="net.bioclipse.cdk.business"/>
+      <import plugin="net.bioclipse.scripting"/>
+      <import plugin="net.bioclipse.chemoinformatics"/>
+      <import plugin="net.bioclipse.cml"/>
+      <import plugin="net.bioclipse.ui"/>
+      <import plugin="org.eclipse.help"/>
+      <import plugin="net.bioclipse.ioformats"/>
+      <import plugin="org.openscience.cdk.ioformats"/>
+      <import plugin="org.openscience.cdk.core"/>
+      <import plugin="org.openscience.cdk.interfaces" version="1.3.8" match="greaterOrEqual"/>
    </requires>
 
    <plugin
