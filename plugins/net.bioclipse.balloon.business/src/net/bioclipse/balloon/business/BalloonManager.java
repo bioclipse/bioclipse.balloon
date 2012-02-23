@@ -352,10 +352,10 @@ public class BalloonManager implements IBioclipseManager {
         try {
 
             //Read timeout from prefs
-            int timeout 
-                = Activator.getDefault().getPreferenceStore()
-                           .getInt( net.bioclipse.balloon.business
-                                       .Activator.BALLOON_TIMEOUT );
+            int timeout = net.bioclipse.balloon.business.Activator
+            		.getDefault().getPreferenceStore()
+                    .getInt( net.bioclipse.balloon.business.Activator
+                    		.BALLOON_TIMEOUT );
 
             //Just to be sure...
             if (timeout<=0)

@@ -65,8 +65,6 @@ public class Activator extends AbstractUIPlugin {
                                   null );
         javaFinderTracker.open();
         
-        getPreferenceStore().setDefault(BALLOON_TIMEOUT, DEFAULT_BALLOON_TIMEOUT);
-
     }
 
     /*
@@ -130,13 +128,4 @@ public class Activator extends AbstractUIPlugin {
         return manager;
     }
 
-    /** 
-     * Initializes a preference store with default preference values 
-     * for this plug-in.
-     */
-    protected void initializeDefaultPreferences(IPreferenceStore store) {
-        store.setDefault(BALLOON_TIMEOUT, DEFAULT_BALLOON_TIMEOUT);
-        logger.debug( "Default balloon preferences set timeout: " 
-                      + DEFAULT_BALLOON_TIMEOUT );
-    }
 }

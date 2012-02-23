@@ -128,5 +128,11 @@
             primary="true">
       </toc>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="net.bioclipse.balloon.ui.BalloonPreferenceInitializer">
+      </initializer>
+   </extension>
 
 </plugin>
