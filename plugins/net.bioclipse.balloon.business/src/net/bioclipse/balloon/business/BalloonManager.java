@@ -445,11 +445,12 @@ public class BalloonManager implements IBioclipseManager {
         String path = inputfile.substring( 0, lastpathsep );
         String name = inputfile.substring( lastpathsep + 1, 
                                            inputfile.length() - 4 );
-//        String currentExtension = inputfile.substring( inputfile.length() - 4, 
-//                                                       inputfile.length() );
+        String currentExtension = inputfile.substring( inputfile.length() - 4, 
+                                                       inputfile.length() );
 
         String ext = "";
         if (numConformations>1) ext = ".sdf";
+        else if(currentExtension.equals(".sdf")) ext = ".sdf";
         else ext = ".mdl";
 //        else ext = currentExtension;
         //TODO: bring this back if we decide to convert back to CML after balloon
