@@ -55,6 +55,16 @@ public class BalloonManager implements IBioclipseManager {
         = Logger.getLogger( BalloonManager.class );
 
     private static List<String> supportedContentTypes;
+    static {
+        // These entries need to match the command in plugin.xml but found
+        // no easy way to read this info from there
+        supportedContentTypes = new ArrayList<String>();
+        supportedContentTypes.add( "net.bioclipse.contenttypes.smi" );
+        supportedContentTypes.add( "net.bioclipse.contenttypes.sdf" );
+        supportedContentTypes.add( "net.bioclipse.contenttypes.mdlMolFile" );
+        supportedContentTypes
+                        .add( "net.bioclipse.contenttypes.cml.singleMolecule2d" );
+    }
     
     /**
      * Defines the Bioclipse namespace for balloon.
@@ -264,9 +274,6 @@ public class BalloonManager implements IBioclipseManager {
                                            int numConformations ) 
                   throws BioclipseException {
         
-        if (supportedContentTypes==null)
-            fillSupportedContentTypes();
-
         //Must have different input as output files
         if (inputfile.equals( outputfile )) 
             throw new IllegalArgumentException("Outputfile must be different " +
@@ -399,22 +406,6 @@ public class BalloonManager implements IBioclipseManager {
         return outfile;
 
     }
-
-
-
-    private void fillSupportedContentTypes() {
-
-        //These entries need to match the command in plugin.xml but found
-        //no easy way to read this info from there
-        supportedContentTypes=new ArrayList<String>();
-        supportedContentTypes.add( "net.bioclipse.contenttypes.smi" );
-        supportedContentTypes.add( "net.bioclipse.contenttypes.sdf" );
-        supportedContentTypes.add( "net.bioclipse.contenttypes.mdlMolFile" );
-        supportedContentTypes.add( 
-            "net.bioclipse.contenttypes.cml.singleMolecule2d" );
-        
-    }
-
 
     private boolean isSupportedContenttype(IContentDescription condesc) {
 
