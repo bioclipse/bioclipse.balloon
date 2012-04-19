@@ -16,6 +16,8 @@ import java.util.List;
 import net.bioclipse.balloon.business.Activator;
 import net.bioclipse.balloon.business.IBalloonManager;
 import net.bioclipse.core.business.BioclipseException;
+import net.bioclipse.core.util.LogUtils;
+import net.bioclipse.jobs.BioclipseUIJob;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.commands.AbstractHandler;
@@ -29,11 +31,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
  * Our sample handler extends AbstractHandler, an IHandler base class.
@@ -62,25 +64,51 @@ public class BalloonGen3DHandler extends AbstractHandler {
         IStructuredSelection ssel = (IStructuredSelection)sel;
 
         //We operate on files and IMolecules
-        List<String> filenames=new ArrayList<String>();
+        List<IFile> inputFiles = new ArrayList<IFile>();
         List<IResource> foldersToRefresh=new ArrayList<IResource>();
         //Collect files
         for (Object obj : ssel.toList()){
             if ( obj instanceof IFile ) {
                 IFile file = (IFile) obj;
                 //                filenames.add( file.getRawLocation().toOSString() );
-                filenames.add( file.getFullPath().toOSString() );
+                inputFiles.add( file );
                 foldersToRefresh.add( file.getParent() );
             }
         }
 
-        logger.debug( "Balloon selection contained: " + filenames.size() + " files." );
+        logger.debug( "Balloon selection contained: " + inputFiles.size()
+                      + " files." );
 
-        if (filenames.size()<=0) return null;
+        if ( inputFiles.size() <= 0 )
+            return null;
 
-        final List<String> final_fnames = filenames;
+        final List<String> final_fnames = null;
         final List<IResource> final_foldersToRefresh = foldersToRefresh;
 
+        IBalloonManager balloon = Activator.getDefault().getJavaBalloonManager();
+        for ( IFile input : inputFiles ) {
+            try {
+                input.setHidden( true );
+            } catch ( CoreException e ) {
+                logger.warn( e.getMessage(), e );
+            }
+            balloon.generate3Dcoordinates( input, new BioclipseUIJob<IFile>() {
+
+                @Override
+                public void runInUI() {
+
+                    try {
+                        IFile result = this.getReturnValue();
+                        result.getParent()
+                                        .refreshLocal( IResource.DEPTH_ONE,
+                                                       new NullProgressMonitor() );
+                    } catch ( CoreException e ) {
+                        LogUtils.handleException( e, logger,
+                                                  "net.bioclipse.balloon.business" );
+                    }
+                }
+            } );
+        }
         //Set up a job
         Job job = new Job("Ballon 3D conformer generation") {
             protected IStatus run(IProgressMonitor monitor) {
@@ -125,9 +153,9 @@ public class BalloonGen3DHandler extends AbstractHandler {
                 return Status.OK_STATUS;
             }
         };
-        job.setPriority(Job.LONG);
-        job.setUser( true );
-        job.schedule(); // start as soon as possible
+        // job.setPriority(Job.LONG);
+        // job.setUser( true );
+        // job.schedule(); // start as soon as possible
 
         //Bring forth the ProgressView
 
