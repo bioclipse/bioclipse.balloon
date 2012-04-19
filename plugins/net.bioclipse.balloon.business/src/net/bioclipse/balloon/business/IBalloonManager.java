@@ -12,15 +12,17 @@ package net.bioclipse.balloon.business;
 
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-
 import net.bioclipse.cdk.domain.ICDKMolecule;
 import net.bioclipse.core.PublishedClass;
 import net.bioclipse.core.PublishedMethod;
 import net.bioclipse.core.Recorded;
 import net.bioclipse.core.business.BioclipseException;
 import net.bioclipse.core.domain.IMolecule;
+import net.bioclipse.jobs.BioclipseUIJob;
 import net.bioclipse.managers.business.IBioclipseManager;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 
 @PublishedClass( "Contains methods related to Balloon")
@@ -191,4 +193,5 @@ public interface IBalloonManager extends IBioclipseManager {
     												   IProgressMonitor monitor) 
     												   throws BioclipseException;
 
+    public void generate3Dcoordinates( IFile input, BioclipseUIJob<IFile> uiJob );
 }

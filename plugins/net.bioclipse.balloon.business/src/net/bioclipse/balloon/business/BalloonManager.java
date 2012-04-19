@@ -14,8 +14,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -37,6 +42,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
+import org.openscience.cdk.io.SDFWriter;
 
 /**
  * A Bioclipse Manager for invoking Balloon
@@ -475,5 +481,251 @@ public class BalloonManager implements IBioclipseManager {
 
     }
 
+    /**
+     * Thread safe method for calling balloon with one mdl-file
+     * 
+     * @param infile
+     * @param numConformations
+     * @return
+     * @throws BioclipseException
+     */
+    private String calculateWithBalloon( String infile, int numConformations )
+                                                                              throws BioclipseException {
 
+        String outfile = constructOutputFilename( infile, numConformations );
+        try {
+
+            //Read timeout from prefs
+            int timeout = net.bioclipse.balloon.business.Activator
+                    .getDefault().getPreferenceStore()
+                    .getInt( net.bioclipse.balloon.business.Activator
+                            .BALLOON_TIMEOUT );
+
+            //Just to be sure...
+            if (timeout<=0)
+                timeout = net.bioclipse.balloon.business
+                             .Activator.DEFAULT_BALLOON_TIMEOUT;
+            
+            //Seconds -> ms
+            Long msTimout=new Long(timeout*1000);
+            
+            //Create a native runner and execute Balloon with it for a 
+            //certain timeout writing from inputfile to outputfile with 
+            //desired number of conformations
+            BalloonRunner runner=new BalloonRunner(msTimout);
+            boolean failed =
+                            !runner.runBalloon( infile, outfile,
+                                                 numConformations );
+            if ( failed ) {
+                throw new BioclipseException(
+                              "Balloon execution failed. Native " +
+                              "BalloonRunner returned false." );
+            }
+        } catch ( ExecutionException e ) {
+            throw new BioclipseException( "Balloon execution failed. Reason: " 
+                                          + e.getMessage(), e );
+        } catch ( InterruptedException e ) {
+            throw new BioclipseException( "Balloon Was interrupted. Reason: " 
+                                          + e.getMessage(), e );
+        } catch ( TimeoutException e ) {
+            throw new BioclipseException( "Balloon timed out. Reason: " 
+                                          + e.getMessage(), e );
+        } catch ( IOException e ) {
+            throw new BioclipseException( "Balloon I/O error. Reason: " 
+                                          + e.getMessage(), e );
+        }
+        
+        return outfile;
+
+    }
+
+    public IFile generate3Dcoordinates( final IFile input,
+                                        final IProgressMonitor monitor )
+                                                                        throws BioclipseException,
+                                                                        CoreException,
+                                                                        IOException {
+    	final ICDKManager cdk = net.bioclipse.cdk.business.Activator.getDefault().getJavaCDKManager();
+        final int numOfMolcules = cdk.numberOfEntriesInSDF( input, monitor );
+        monitor.beginTask( "Generating 3D coordinates", numOfMolcules );
+
+        final String file =
+                        constructOutputFilename( input.getRawLocation()
+                                        .toOSString(), 1 );
+    	
+        final BlockingQueue<MolPos> inputMoleculesQueue =
+                        new ArrayBlockingQueue<MolPos>( 10 );
+        final BlockingQueue<MolPos> outputMoleculesQueue =
+                        new ArrayBlockingQueue<MolPos>( 10 );
+    	final Boolean[] fileIsParsed = { Boolean.FALSE};
+        final MolPos POISION =
+                        new MolPos( -1, Collections.emptyMap(),
+                                    "This is the end of the line" );
+    	// @new thread
+    	Runnable parse = new Runnable() {
+    		public void run() {
+
+                try {
+                    Iterator<? extends ICDKMolecule> parserIterator =
+                                    cdk.createMoleculeIterator( input );
+                    long pos = 0;
+                    while ( parserIterator.hasNext() ) {
+                        ICDKMolecule molecule = parserIterator.next();
+                        ++pos;
+                        // save to temp file
+                        String tempFile =
+                                        serializeMoleculeToTempFile( molecule );
+                        MolPos mp =
+                                        new MolPos( pos, molecule
+                                                        .getAtomContainer()
+                                                        .getProperties(),
+                                                    tempFile );
+                        inputMoleculesQueue.put( mp );
+                        if ( monitor.isCanceled() )
+                            break;
+                    }
+                } catch ( Exception e ) {
+                    e.printStackTrace();// TODO handel exception
+                }
+                fileIsParsed[0] = Boolean.TRUE;
+    		}
+    	};
+    	
+    	Runnable generator = new Runnable() {
+    		public void run() {
+
+                while ( !fileIsParsed[0] || !inputMoleculesQueue.isEmpty() ) {
+    				try {
+                        MolPos input = inputMoleculesQueue.take();
+                        String output = calculateWithBalloon( input.file, 1 );
+
+                        MolPos out = input.newOutput( output );
+                        outputMoleculesQueue.put( out );
+                        if ( monitor.isCanceled() )
+                            break;
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					} catch (BioclipseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+    				
+    			}
+    			try {
+					outputMoleculesQueue.put(POISION);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    		}
+    	};
+    	final int numThreads = Runtime.getRuntime().availableProcessors();
+    	Runnable writer = new Runnable() {
+    		int numberOfThreads = numThreads;
+    		public void run() {
+
+                SDFWriter mdlwriter;
+                try {
+                    mdlwriter = new SDFWriter(
+                                   new FileWriter( new File( file ) ) );
+                } catch ( IOException e) {
+                    logger.error( e.getMessage(), e );
+                    return;
+                }
+                long pos = 1;
+                LinkedList<MolPos> buffer = new LinkedList<MolPos>();
+    			int foundPoinsions = 0;
+                while ( !buffer.isEmpty() || foundPoinsions < numberOfThreads ) {
+    				try {
+                        MolPos input = null;
+                        if ( !buffer.isEmpty()
+                             && outputMoleculesQueue.isEmpty() )
+                            input = buffer.pop();
+                        else
+                            input = outputMoleculesQueue.take();
+
+                        if ( input == POISION ) {
+                            foundPoinsions++;
+                            continue;
+                        }
+                        // Buffer if not in order
+                        if ( pos != input.pos ) {
+                            // check in buffer
+                            MolPos newInput = null;
+                            Iterator<MolPos> bufferIterator = buffer.iterator();
+                            while ( bufferIterator.hasNext() ) {
+                                MolPos p = bufferIterator.next();
+                                if ( pos == p.pos ) {
+                                    bufferIterator.remove();
+                                    newInput = p;
+                                    break;
+                                }
+                            }
+                            buffer.add( input );
+                            if ( newInput == null ) {
+                                continue;
+                            } else
+                                input = newInput;
+                        }
+                        ++pos;
+                        monitor.worked( 1 );
+                        monitor.subTask( "Done " + pos + "/" + numOfMolcules );
+                        List<ICDKMolecule> molecules =
+                                        cdk.loadMolecules( input.file );
+						ICDKMolecule molecule = molecules.get(0);
+                        molecule.getAtomContainer()
+                                        .setProperties( input.properties );
+						mdlwriter.write(molecule.getAtomContainer());
+                        if ( monitor.isCanceled() )
+                            break;
+                    } catch ( Exception e ) {
+                        logger.error( e.getMessage(), e );
+					}
+    			}
+    			try {
+					mdlwriter.close();
+				} catch (IOException e) {
+                    logger.error( e.getMessage(), e );
+				}
+    		}
+    	};
+
+        Thread parserThread = new Thread( parse );
+        parserThread.start();
+
+        for ( int i = 0; i < numThreads; i++ )
+            new Thread( generator ).start();
+
+        Thread writerThread = new Thread( writer );
+        writerThread.start();
+        while ( true ) {
+            try {
+                writerThread.join();
+                break;
+            } catch ( InterruptedException e ) {
+            // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return ResourcePathTransformer.getInstance()
+.transform( file );
+    }
+
+}
+
+class MolPos {
+
+    final long                pos;
+    final Map<Object, Object> properties;
+    final String              file;
+
+    public MolPos(long pos, Map<Object, Object> properties, String file) {
+        this.pos = pos;
+        this.properties = properties;
+        this.file = file;
+    }
+
+    public MolPos newOutput( String outputFile ) {
+
+        return new MolPos( pos, properties, outputFile );
+    }
 }
