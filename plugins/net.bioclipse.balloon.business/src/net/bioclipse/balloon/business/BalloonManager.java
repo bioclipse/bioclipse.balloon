@@ -560,6 +560,7 @@ public class BalloonManager implements IBioclipseManager {
         final MolPos POISION =
                         new MolPos( -1, Collections.emptyMap(),
                                     "This is the end of the line" );
+        final int numThreads = Runtime.getRuntime().availableProcessors();
     	// @new thread
     	Runnable parse = new Runnable() {
     		public void run() {
@@ -583,6 +584,8 @@ public class BalloonManager implements IBioclipseManager {
                         if ( monitor.isCanceled() )
                             break;
                     }
+                    for ( int i = 0; i < numThreads; i++ )
+                        inputMoleculesQueue.put( POISION );
                 } catch ( Exception e ) {
                     e.printStackTrace();// TODO handel exception
                 }
@@ -596,6 +599,9 @@ public class BalloonManager implements IBioclipseManager {
                 while ( !fileIsParsed[0] || !inputMoleculesQueue.isEmpty() ) {
     				try {
                         MolPos input = inputMoleculesQueue.take();
+                        if ( input.equals( POISION ) ) {
+                            break;
+                        }
                         String output = calculateWithBalloon( input.file, 1 );
 
                         MolPos out = input.newOutput( output );
@@ -618,7 +624,7 @@ public class BalloonManager implements IBioclipseManager {
 				}
     		}
     	};
-    	final int numThreads = Runtime.getRuntime().availableProcessors();
+
     	Runnable writer = new Runnable() {
     		int numberOfThreads = numThreads;
     		public void run() {
