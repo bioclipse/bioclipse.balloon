@@ -45,7 +45,6 @@ The Eclipse Public License accompanies this distribution, and is available at ht
 
    <plugin
          id="net.bioclipse.balloon.linux"
-         os="linux"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -53,7 +52,6 @@ The Eclipse Public License accompanies this distribution, and is available at ht
 
    <plugin
          id="net.bioclipse.balloon.macosx"
-         os="macosx"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -61,7 +59,6 @@ The Eclipse Public License accompanies this distribution, and is available at ht
 
    <plugin
          id="net.bioclipse.balloon.win32"
-         os="win32"
          download-size="0"
          install-size="0"
          version="0.0.0"
