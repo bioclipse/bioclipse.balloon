@@ -87,11 +87,6 @@ public class BalloonGen3DHandler extends AbstractHandler {
 
         IBalloonManager balloon = Activator.getDefault().getJavaBalloonManager();
         for ( IFile input : inputFiles ) {
-            try {
-                input.setHidden( true );
-            } catch ( CoreException e ) {
-                logger.warn( e.getMessage(), e );
-            }
             balloon.generate3Dcoordinates( input, new BioclipseUIJob<IFile>() {
 
                 @Override
