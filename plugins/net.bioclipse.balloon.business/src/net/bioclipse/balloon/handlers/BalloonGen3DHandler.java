@@ -29,7 +29,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.content.IContentDescription;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -85,8 +88,27 @@ public class BalloonGen3DHandler extends AbstractHandler {
         final List<String> final_fnames = null;
         final List<IResource> final_foldersToRefresh = foldersToRefresh;
 
+        IContentType cmlType = Platform
+                        .getContentTypeManager()
+                        .getContentType( "net.bioclipse.contenttypes.cml.singleMolecule2d" );
+
         IBalloonManager balloon = Activator.getDefault().getJavaBalloonManager();
         for ( IFile input : inputFiles ) {
+            try {
+                IContentDescription contentDescirpton = input
+                                .getContentDescription();
+                if ( contentDescirpton != null && contentDescirpton
+                                     .getContentType().isKindOf( cmlType ) ) {
+                    balloon.generate3Dcoordinates( input.getRawLocation()
+                                    .toOSString() );
+                    return null;
+                }
+            } catch ( Exception e ) {
+                LogUtils.handleException( e, logger,
+                                          "net.bioclipse.balloon.business" );
+                return null;
+            }
+
             balloon.generate3Dcoordinates( input, new BioclipseUIJob<IFile>() {
 
                 @Override
