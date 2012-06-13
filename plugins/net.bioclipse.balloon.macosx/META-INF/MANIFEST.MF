@@ -10,4 +10,4 @@ Export-Package: net.bioclipse.balloon.runner
 Bundle-ClassPath: .
 Import-Package: net.sf.jnati.proc,
  org.apache.log4j
-Eclipse-PlatformFilter: (osgi.os=macosx)
+Eclipse-PlatformFilter: (os=macosx)
