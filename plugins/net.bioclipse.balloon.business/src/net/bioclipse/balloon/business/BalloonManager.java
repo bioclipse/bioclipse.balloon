@@ -1,5 +1,6 @@
 /* *****************************************************************************
  * Copyright (c) 2009 Ola Spjuth.
+ *               2012 Jonathan Alvarsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,6 +31,7 @@ import net.bioclipse.cdk.domain.ICDKMolecule;
 import net.bioclipse.core.ResourcePathTransformer;
 import net.bioclipse.core.business.BioclipseException;
 import net.bioclipse.core.domain.IMolecule;
+import net.bioclipse.core.util.TimeCalculator;
 import net.bioclipse.managers.business.IBioclipseManager;
 import net.bioclipse.ui.business.Activator;
 import net.bioclipse.ui.business.IUIManager;
@@ -108,6 +110,7 @@ public class BalloonManager implements IBioclipseManager {
         monitor.beginTask("Balloon conformation generation", molecules.size());
         
         int i=0;
+        long before = System.currentTimeMillis();
         for (IMolecule mol : molecules){
         	i++;
 
@@ -124,8 +127,13 @@ public class BalloonManager implements IBioclipseManager {
 				logger.error("Balloon failed on mol " + i + ". Reason: " + e.getMessage());
 			}
             monitor.worked(1);
-            if (i%5==0)
-            	monitor.subTask("Processed: " + i + "/" + molecules.size() +" molecules");
+            if (i%5==0) {
+                int size = molecules.size();
+            	    monitor.subTask(
+            	        "Processed: " + i + "/" + size +" molecules (" 
+            	        + TimeCalculator.generateTimeRemainEst(before, i, size) 
+            	        + ")" );
+            }
         }
         
         monitor.done();
@@ -638,6 +646,7 @@ public class BalloonManager implements IBioclipseManager {
                     return;
                 }
                 long pos = 1;
+                long before = System.currentTimeMillis();
                 LinkedList<MolPos> buffer = new LinkedList<MolPos>();
     			int foundPoinsions = 0;
                 while ( !buffer.isEmpty() || foundPoinsions < numberOfThreads ) {
@@ -674,7 +683,11 @@ public class BalloonManager implements IBioclipseManager {
                         }
                         ++pos;
                         monitor.worked( 1 );
-                        monitor.subTask( "Done " + pos + "/" + numOfMolcules );
+                        monitor.subTask( 
+                            "Done " + pos + "/" + numOfMolcules 
+                            + " (" + TimeCalculator.generateTimeRemainEst( 
+                                  before, (int)pos, numOfMolcules ) + ")" );
+                        
                         List<ICDKMolecule> molecules =
                                         cdk.loadMolecules( input.file );
 						ICDKMolecule molecule = molecules.get(0);
