@@ -3,7 +3,7 @@
       id="net.bioclipse.balloon_feature"
       label="Balloon Feature"
       version="2.5.0.qualifier"
-      provider-name="The Bioclispe Team"
+      provider-name="The Bioclipse Team"
       plugin="net.bioclipse.balloon.business"
       os="linux,macosx,win32">
 
