@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
@@ -560,14 +561,12 @@ public class BalloonManager implements IBioclipseManager {
                         constructOutputFilename( input.getRawLocation()
                                         .toOSString(), 1 );
     	
-        final BlockingQueue<MolPos> inputMoleculesQueue =
-                        new ArrayBlockingQueue<MolPos>( 10 );
-        final BlockingQueue<MolPos> outputMoleculesQueue =
-                        new ArrayBlockingQueue<MolPos>( 10 );
+        final BlockingQueue<MolInfo<MolPos>> inputMoleculesQueue =
+                        new ArrayBlockingQueue<MolInfo<MolPos>>( 10 );
+        final BlockingQueue<MolInfo<MolPos>> outputMoleculesQueue =
+                        new ArrayBlockingQueue<MolInfo<MolPos>>( 10 );
     	final Boolean[] fileIsParsed = { Boolean.FALSE};
-        final MolPos POISION =
-                        new MolPos( -1, Collections.emptyMap(),
-                                    "This is the end of the line" );
+        final MolInfo<MolPos> POISION = MolInfo.poision();
         final int numThreads = Runtime.getRuntime().availableProcessors();
     	// @new thread
     	Runnable parse = new Runnable() {
@@ -578,24 +577,28 @@ public class BalloonManager implements IBioclipseManager {
                                     cdk.createMoleculeIterator( input );
                     long pos = 0;
                     while ( parserIterator.hasNext() ) {
-                        ICDKMolecule molecule = parserIterator.next();
-                        ++pos;
-                        // save to temp file
-                        String tempFile =
-                                        serializeMoleculeToTempFile( molecule );
-                        MolPos mp =
-                                        new MolPos( pos, molecule
-                                                        .getAtomContainer()
+                    	++pos;
+                    	MolPos mp = null;
+                    	MolInfo<MolPos> newMol = MolInfo.nothing(pos);
+                    	try {
+                    		ICDKMolecule molecule = parserIterator.next();
+                    		// save to temp file
+                    		String tempFile = serializeMoleculeToTempFile( molecule );
+                    		mp = new MolPos( molecule .getAtomContainer()
                                                         .getProperties(),
                                                     tempFile );
-                        inputMoleculesQueue.put( mp );
                         if ( monitor.isCanceled() )
                             break;
+                    	} catch (Exception e) {
+                    		logger.error(e.getMessage(),e);
+                    		newMol = MolInfo.error(newMol, e);
+                    	}
+                    	inputMoleculesQueue.put( MolInfo.some(newMol,mp) );
                     }
                     for ( int i = 0; i < numThreads; i++ )
                         inputMoleculesQueue.put( POISION );
                 } catch ( Exception e ) {
-                    e.printStackTrace();// TODO handel exception
+                    logger.error(e.getMessage(),e);
                 }
                 fileIsParsed[0] = Boolean.TRUE;
     		}
@@ -606,29 +609,35 @@ public class BalloonManager implements IBioclipseManager {
 
                 while ( !fileIsParsed[0] || !inputMoleculesQueue.isEmpty() ) {
     				try {
-                        MolPos input = inputMoleculesQueue.take();
-                        if ( input.equals( POISION ) ) {
-                            break;
-                        }
-                        String output = calculateWithBalloon( input.file, 1 );
-
-                        MolPos out = input.newOutput( output );
-                        outputMoleculesQueue.put( out );
+    					MolInfo<MolPos> input = inputMoleculesQueue.take();
+    					MolInfo<MolPos> output = MolInfo.nothing(input.pos);
+    					if(input.equals(POISION)) {
+    						break;
+    					}
+    					try{
+    					for(MolPos in:input){
+    						String outputFile = calculateWithBalloon(in.file, 1);
+    						MolPos out = in.newOutput(outputFile);
+    						output = MolInfo.some(input, out);
+    					}
+    					} catch ( Exception e) {
+    						for(MolPos in:input){
+    							logger.error("File: "+in.file);
+    						}
+    						logger.error(e.getMessage(),e);
+    						output = MolInfo.error(input,e);
+    					}
+    					outputMoleculesQueue.put( output );
                         if ( monitor.isCanceled() )
                             break;
 					} catch (InterruptedException e) {
-						e.printStackTrace();
-					} catch (BioclipseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-    				
+						logger.info("Interrupted: "+e.getMessage(),e);
+					} 
     			}
     			try {
 					outputMoleculesQueue.put(POISION);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.info("Interrupted: "+e.getMessage(),e);
 				}
     		}
     	};
@@ -647,11 +656,11 @@ public class BalloonManager implements IBioclipseManager {
                 }
                 long pos = 1;
                 long before = System.currentTimeMillis();
-                LinkedList<MolPos> buffer = new LinkedList<MolPos>();
+                LinkedList<MolInfo<MolPos>> buffer = new LinkedList<MolInfo<MolPos>>();
     			int foundPoinsions = 0;
                 while ( !buffer.isEmpty() || foundPoinsions < numberOfThreads ) {
     				try {
-                        MolPos input = null;
+                        MolInfo<MolPos> input = null;
                         if ( !buffer.isEmpty()
                              && outputMoleculesQueue.isEmpty() )
                             input = buffer.pop();
@@ -665,10 +674,10 @@ public class BalloonManager implements IBioclipseManager {
                         // Buffer if not in order
                         if ( pos != input.pos ) {
                             // check in buffer
-                            MolPos newInput = null;
-                            Iterator<MolPos> bufferIterator = buffer.iterator();
+                            MolInfo<MolPos> newInput = null;
+                            Iterator<MolInfo<MolPos>> bufferIterator = buffer.iterator();
                             while ( bufferIterator.hasNext() ) {
-                                MolPos p = bufferIterator.next();
+                                MolInfo<MolPos> p = bufferIterator.next();
                                 if ( pos == p.pos ) {
                                     bufferIterator.remove();
                                     newInput = p;
@@ -687,13 +696,14 @@ public class BalloonManager implements IBioclipseManager {
                             "Done " + pos + "/" + numOfMolcules 
                             + " (" + TimeCalculator.generateTimeRemainEst( 
                                   before, (int)pos, numOfMolcules ) + ")" );
-                        
-                        List<ICDKMolecule> molecules =
-                                        cdk.loadMolecules( input.file );
-						ICDKMolecule molecule = molecules.get(0);
-                        molecule.getAtomContainer()
-                                        .setProperties( input.properties );
-						mdlwriter.write(molecule.getAtomContainer());
+                        for(MolPos in:input) {
+                        	List<ICDKMolecule> molecules =
+                        			cdk.loadMolecules( in.file );
+                        	ICDKMolecule molecule = molecules.get(0);
+                        	molecule.getAtomContainer()
+                        	.setProperties( in.properties );
+                        	mdlwriter.write(molecule.getAtomContainer());
+                        }
                         if ( monitor.isCanceled() )
                             break;
                     } catch ( Exception e ) {
@@ -731,20 +741,106 @@ public class BalloonManager implements IBioclipseManager {
 
 }
 
-class MolPos {
+abstract class MolInfo<T> implements Iterable<T>{
+	private MolInfo(long pos) {
+		this.pos = pos;
+	}
+	final long pos;
+	
+	public static class Some<T> extends MolInfo<T> {
+		private T value;
+		Some(long pos,T value){
+			super(pos);
+			this.value = value;
+		}
+		public Iterator<T> iterator() {
+			return new ImmutableIterator<T>() {
+				boolean hasNext = true;
+				public boolean hasNext() {
+					return hasNext;
+				}
+				public T next() {
+					if( !hasNext) throw new NoSuchElementException();
+					hasNext = false;
+					return value;
+				}
+			};
+		}
+	}
+	Iterator<T> EMPTY = new ImmutableIterator<T>() {
+		public boolean hasNext() { return false;}
+		public T next() {
+			throw new NoSuchElementException();
+		}
+	};
+	public static class Error<T> extends MolInfo<T> {
+		private final Throwable e;
+		Error(long pos, Throwable e) {
+			super(pos);
+			this.e = e;
+		}
+		
+		public Iterator<T> iterator() { return EMPTY;}
+	}
+	public static class Nothing<T> extends MolInfo<T> {
+		Nothing(long pos) {
+			super(pos);
+		}
+		public Iterator<T> iterator() { return EMPTY;}
+	}
+	private static class Poision<T> extends MolInfo<T> {
+		public Poision() {super(-1);}
+		public Iterator<T> iterator() {
+			return EMPTY;
+		}
+	}
+	private static Poision<Object> poision = new Poision<Object>();
+	private static Nothing<Object> nothing = new Nothing<Object>(-1);
+	private static abstract class ImmutableIterator<T>
+		implements Iterator<T> {
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+	}
+	@SuppressWarnings("unchecked")
+	static <T> MolInfo<T> error(long pos,Throwable e) {
+		return (Error<T>) new Error<Object>(pos,e);
+	}
+	static <T> MolInfo<T> error(MolInfo<T> in,Throwable e) {
+		return error(in.pos,e);
+	}
+	
+	static <T> MolInfo<T> some(MolInfo<T> in, T value) {
+		return value == null ? MolInfo.<T>nothing(in.pos):
+			new Some<T>(in.pos,value);
+	}
+	@SuppressWarnings("unchecked")
+	static <T> MolInfo<T> some(long pos, T value) {
+		return value == null ? MolInfo.<T>nothing(pos):
+			value instanceof MolInfo<?> ? (MolInfo<T>) value: new Some<T>(pos,value);
+	}
+	@SuppressWarnings("unchecked")
+	static <T> MolInfo<T> poision() {
+		return (Poision<T>) poision;
+	}
+	@SuppressWarnings("unchecked")
+	static <T> MolInfo<T> nothing(long pos) {
+		return (Nothing<T>) new Nothing<Object>(pos);
+	}
+}
 
-    final long                pos;
+class MolPos{
+
     final Map<Object, Object> properties;
     final String              file;
 
-    public MolPos(long pos, Map<Object, Object> properties, String file) {
-        this.pos = pos;
+    public MolPos( Map<Object, Object> properties, String file) {
         this.properties = properties;
         this.file = file;
     }
 
     public MolPos newOutput( String outputFile ) {
 
-        return new MolPos( pos, properties, outputFile );
+        return new MolPos( properties, outputFile );
     }
 }
