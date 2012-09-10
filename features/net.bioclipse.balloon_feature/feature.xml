@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="net.bioclipse.balloon_feature"
-      label="Balloon Feature"
+      label="Balloon"
       version="2.5.0.qualifier"
-      provider-name="The Bioclipse Team"
+      provider-name="bioclipse.net"
       plugin="net.bioclipse.balloon.business"
       os="linux,macosx,win32">
 
    <description>
-      Balloon provides Bioclipse with features to generate 3D conformations from chemical structures.
+      3D conformer generation for chemical structures using Balloon (Vainio et al. 2007).
    </description>
 
    <copyright>
