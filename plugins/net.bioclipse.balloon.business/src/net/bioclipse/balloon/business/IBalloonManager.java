@@ -25,7 +25,11 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 
-@PublishedClass( "Contains methods related to Balloon")
+@PublishedClass( "Balloon is a software that creates 3D atomic coordinates. " + 
+                 "This manager provides methods for generating 3D " +
+                 "coordinates using Balloon in a few different ways. More " +
+                 "information can be found at: " +
+                 "http://web.abo.fi/~mivainio/balloon/index.php")
 /**
  * An interface for a Bioclipse Manager for invoking Balloon
  * (http://web.abo.fi/~mivainio/balloon/index.php)
@@ -45,9 +49,9 @@ public interface IBalloonManager extends IBioclipseManager {
     @Recorded
     @PublishedMethod(
         params = "String inputfile",
-        methodSummary = "Generated 3D coodrinates for all molecules in the " +
-        		            "inputfile. Creates a default output file. Inputs: " +
-        		            "inputfile = path to inputfile.")
+        methodSummary = "Generates 3D coodrinates for all molecules in the " +
+        		            "inputfile. Creates a default output file with _3d " +
+        		            "added.")
     String generate3Dcoordinates( String inputfile ) throws BioclipseException;
 
     /**
@@ -61,9 +65,8 @@ public interface IBalloonManager extends IBioclipseManager {
      */
     @PublishedMethod(
         params = "String inputfile, String outputfile",
-        methodSummary = "Generated 3D coodrinates for all molecules in the " +
-        		            "inputfile and saves to outputfile Inputs: inputfile " +
-        		            "= path to inputfile, outputfile = path to outputfile")
+        methodSummary = "Generates 3D coordinates for all molecules in the " +
+        		            "inputfile and saves to outputfile")
     @Recorded
     String generate3Dcoordinates( String inputfile, String outputfile ) 
            throws BioclipseException;
@@ -76,12 +79,11 @@ public interface IBalloonManager extends IBioclipseManager {
      */
     @PublishedMethod(
         params = "List<String> inputfiles",
-        methodSummary = "Generate 3D coordinates for all molecules in a list " +
-        		            "of inputfiles. Creates a default output file. " +
-        		            "Inputs: inputfiles = list of Strings with paths " +
-        		            "to inputfiles" )
+        methodSummary = "Generates 3D coordinates for all molecules in all " +
+        		            "files in inputFiles and stores them to a default " +
+        		            "output file." )
     @Recorded
-    List<String> generate3Dcoordinates( List<String> inputfiles) 
+    List<String> generate3Dcoordinates( List<String> inputFiles) 
                  throws BioclipseException;
 
     /**
@@ -93,10 +95,9 @@ public interface IBalloonManager extends IBioclipseManager {
      */
     @PublishedMethod(
         params = "List<String> inputfiles, int numConformations",
-        methodSummary = "Generate 3D conformations for all molecules in a " +
-        		            "list of inputfiles. inputfiles = list of Strings " +
-        		            "with paths to inputfiles, numConformations = number " +
-        		            "of conformations to generate per molecule." )
+        methodSummary = "Generate numConformations number of 3D " +
+        		            "conformations for each molecule in all files in " +
+        		            "inputFiles and return them in a List.")
     @Recorded
     List<String> generate3Dconformations( List<String> inputfiles, 
                                           int numConformations) 
@@ -111,12 +112,11 @@ public interface IBalloonManager extends IBioclipseManager {
      */
     @PublishedMethod(
         params = "String inputfile, int numConformations",
-        methodSummary = "Generate 3D conformations for all molecules in an " +
-        		            "inputfile. Creates a default output filename. " +
-        		            "inputfile = paths to inputfile, numConformations " +
-        		            "= number of conformations to generate per molecule." )
+        methodSummary = "Generates 3D conformations for all molecules in " +
+        		            "the file inputfile and stores them in a file and " +
+        		            "returns the name of the created file." )
     @Recorded
-    String generate3Dconformations( String inputfile, int numConformations ) 
+    public String generate3Dconformations( String inputfile, int numConformations ) 
            throws BioclipseException;
 
     /**
@@ -131,21 +131,19 @@ public interface IBalloonManager extends IBioclipseManager {
      */
     @PublishedMethod(
         params = "String inputfile, String outputfile, int numConformations",
-        methodSummary = "Generated 3D conformations for all molecules " +
-                        "in the inputfile. \n" +
-                        "Inputs: inputfile = path to inputfile, outputfile " +
-                        "= path to outputfile, numConformations = number of " +
-                        "conformations to generate per molecule.")
+        methodSummary = "Generates 3D conformations for all molecules " +
+                        "in the file inputfile and stores them in a file " +
+                        "and returns the name of the created file."  )
     @Recorded
-    String generate3Dconformations( String inputfile, 
-                                    String outputfile, 
-                                    int numConformations ) 
+    public String generate3Dconformations( String inputfile, 
+                                           String outputfile, 
+                                           int numConformations ) 
            throws BioclipseException;
     
  
     @PublishedMethod(
                      params = "IMolecule molecule",
-                     methodSummary = "Return a new molecule with 3D " +
+                     methodSummary = "Returns a new molecule with 3D " +
                      		"coordinates generated by Balloon.")
     @Recorded
     public ICDKMolecule generate3Dcoordinates( IMolecule molecule ) 
@@ -153,17 +151,19 @@ public interface IBalloonManager extends IBioclipseManager {
 
     @PublishedMethod(
                      params = "IMolecule molecule, int numConf",
-                     methodSummary = "Return a list of molecule with  selected " +
-                     		"number of target 3D " +
-                        "conformations generated by Balloon.")
+                     methodSummary = "Returns a list of molecules with " +
+                     		         "numConf number of 3D confirmations " +
+                     		         "generated by Balloon for the given " +
+                     		         "molecule.")
     @Recorded
     public List<ICDKMolecule> generate3Dconformations( IMolecule molecule, int numConf) 
     throws BioclipseException;
  
     @PublishedMethod(
                      params = "List<IMolecule> molecules",
-                     methodSummary = "Return a list of molecules with 3D " +
-                        "coordinates generated by Balloon.")
+                     methodSummary = "Returns a new list of molecules with " +
+                     		         "3D coordinates for the given list of " +
+                     		         "molecules generated by Balloon.")
     @Recorded
     public List<ICDKMolecule> generateMultiple3Dcoordinates( 
                                                      List<IMolecule> molecules ) 
@@ -176,11 +176,10 @@ public interface IBalloonManager extends IBioclipseManager {
 
     
     @PublishedMethod(
-                     params = "List<IMolecule> molecules, int numConf",
-                     methodSummary = "Return a list of molecule with the " +
-                     		"selected " +
-                        "number of target 3D " +
-                        "conformations generated by Balloon.")
+        params = "List<IMolecule> molecules, int numConf",
+        methodSummary = "Returns a new list of molecules with numConf " +
+        		            "number of 3D conformations generated by Balloon " +
+        		            "for the molecules in the given list.")
     @Recorded
     public List<ICDKMolecule> generateMultiple3Dconformations( 
                                                       List<IMolecule> molecules, 
