@@ -14,6 +14,7 @@ package net.bioclipse.balloon.business;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -38,14 +39,20 @@ import net.bioclipse.ui.business.Activator;
 import net.bioclipse.ui.business.IUIManager;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 import org.openscience.cdk.io.SDFWriter;
+import org.openscience.cdk.io.formats.IChemFormat;
 
 /**
  * A Bioclipse Manager for invoking Balloon
@@ -60,7 +67,7 @@ import org.openscience.cdk.io.SDFWriter;
  */
 public class BalloonManager implements IBioclipseManager {
 
-    private static final Logger logger 
+    private final Logger logger
         = Logger.getLogger( BalloonManager.class );
 
     private static List<String> supportedContentTypes;
@@ -438,13 +445,28 @@ public class BalloonManager implements IBioclipseManager {
     }
 
 
+    static IPath constructOutputFile(IPath inPath,int numConformations) {
+    	String ext="";
+    	if(numConformations >1 || inPath.getFileExtension().equals("sdf")) {
+    		ext="sdf";
+    	} else {
+    		ext="mdl";
+    	}
+    	String name = inPath.removeFileExtension().lastSegment()+"_3d";
+    	IPath rootPath = inPath.removeFileExtension().removeLastSegments(1);
+    	IPath result = rootPath.append(name);
+    	for(int cnt=1;result.addFileExtension(ext).toFile().exists();cnt++) {
+    		result = rootPath.append(name+String.format("_%d",cnt));
+    	}
+    	return result.addFileExtension(ext);
+    }
     /**
      * Helper method to construct output filename from inputfilename +_3d
      * @param inputfile
      * @param numConformations
      * @return
      */
-    private String constructOutputFilename( String inputfile, 
+    static String constructOutputFilename( String inputfile,
                                             int numConformations ) {
 
         int lastpathsep = inputfile.lastIndexOf( File.separator );
@@ -481,7 +503,7 @@ public class BalloonManager implements IBioclipseManager {
      * @param cnt
      * @return
      */
-    private String getAFilename(String pathname, String ext, int cnt) {
+    static String getAFilename(String pathname, String ext, int cnt) {
 
         if (cnt<=1)
             return pathname+"_3d" + ext;
@@ -549,13 +571,16 @@ public class BalloonManager implements IBioclipseManager {
     }
 
     public IFile generate3Dcoordinates( final IFile input,
-                                        final IProgressMonitor monitor )
+                                        final IProgressMonitor progressMonitor )
                                                                         throws BioclipseException,
                                                                         CoreException,
                                                                         IOException {
+    	final SubMonitor monitor = SubMonitor.convert(progressMonitor);
     	final ICDKManager cdk = net.bioclipse.cdk.business.Activator.getDefault().getJavaCDKManager();
-        final int numOfMolcules = cdk.numberOfEntriesInSDF( input, monitor );
-        monitor.beginTask( "Generating 3D coordinates", numOfMolcules );
+        monitor.beginTask( "Generating 3D coordinates", 10000 );
+        final int numOfMolcules = cdk.numberOfEntriesInSDF( input, monitor.newChild(10) );
+
+        monitor.setWorkRemaining(numOfMolcules *30);
 
         final String file =
                         constructOutputFilename( input.getRawLocation()
@@ -691,19 +716,26 @@ public class BalloonManager implements IBioclipseManager {
                                 input = newInput;
                         }
                         ++pos;
-                        monitor.worked( 1 );
-                        monitor.subTask( 
-                            "Done " + pos + "/" + numOfMolcules 
-                            + " (" + TimeCalculator.generateTimeRemainEst( 
-                                  before, (int)pos, numOfMolcules ) + ")" );
+                        SubMonitor progress = monitor.newChild(30);
                         for(MolPos in:input) {
-                        	List<ICDKMolecule> molecules =
-                        			cdk.loadMolecules( in.file );
+                        	List<ICDKMolecule> molecules = Collections.emptyList();
+                        	IChemFormat format = cdk.guessFormatFromExtension(in.file);
+
+                        	IFileStore fileStore =  EFS.getLocalFileSystem().getStore(new Path(in.file));
+                        	InputStream is = fileStore.openInputStream(EFS.NONE, progress.newChild(10));
+                        	molecules = cdk.loadMolecules(is, format, progress.newChild(10));
+
                         	ICDKMolecule molecule = molecules.get(0);
                         	molecule.getAtomContainer()
                         	.setProperties( in.properties );
                         	mdlwriter.write(molecule.getAtomContainer());
+                        	progress.worked(10);
                         }
+
+                        monitor.setWorkRemaining((int) (numOfMolcules-pos)*30);
+                        monitor.subTask( "Done " + pos + "/" + numOfMolcules
+                        		+ " (" + TimeCalculator.generateTimeRemainEst(
+                        				before, (int)pos, numOfMolcules ) + ")" );
                         if ( monitor.isCanceled() )
                             break;
                     } catch ( Exception e ) {
@@ -721,20 +753,30 @@ public class BalloonManager implements IBioclipseManager {
         Thread parserThread = new Thread( parse );
         parserThread.start();
 
+        Thread[] workers = new Thread[numThreads];
         for ( int i = 0; i < numThreads; i++ )
-            new Thread( generator ).start();
+            (workers[i] = new Thread( generator,"Balloon Worker "+i )).start();
 
         Thread writerThread = new Thread( writer );
         writerThread.start();
         while ( true ) {
             try {
                 writerThread.join();
+                parserThread.join();
                 break;
             } catch ( InterruptedException e ) {
             // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
+        int runCount =0;
+        for(Thread t:workers){
+        	if(t.isAlive()) {
+        		runCount++;
+        		t.interrupt();
+        	}
+        }
+        logger.debug(runCount+" treads is still alive");
         return ResourcePathTransformer.getInstance()
 .transform( file );
     }
