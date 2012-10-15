@@ -80,24 +80,27 @@ public interface IBalloonManager extends IBioclipseManager {
     @PublishedMethod(
         params = "List<String> inputfiles",
         methodSummary = "Generates 3D coordinates for all molecules in all " +
-        		            "files in inputFiles and stores them to a default " +
-        		            "output file." )
+        		            "files in inputFiles and create new files with the" +
+        		            "result, returning a list of file names for the new " +
+        		            "files." )
     @Recorded
     List<String> generate3Dcoordinates( List<String> inputFiles) 
                  throws BioclipseException;
 
     /**
-     * Generate 3D conformations for one or more inputfiles in a list.
+     * Generate 3D conformations for one or more inputfiles in a list as new
+     * files.
      * @param inputfiles List of paths to the inputfiles.
      * @param numConformations Number of conformations to generate per molecule
-     * @return
+     * @return 
      * @throws BioclipseException 
      */
     @PublishedMethod(
         params = "List<String> inputfiles, int numConformations",
         methodSummary = "Generate numConformations number of 3D " +
         		            "conformations for each molecule in all files in " +
-        		            "inputFiles and return them in a List.")
+        		            "inputFiles, store in new files and return a List of" +
+        		            "file names.")
     @Recorded
     List<String> generate3Dconformations( List<String> inputfiles, 
                                           int numConformations) 
