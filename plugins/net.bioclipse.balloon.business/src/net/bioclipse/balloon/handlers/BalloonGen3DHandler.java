@@ -15,6 +15,8 @@ import java.util.List;
 
 import net.bioclipse.balloon.business.Activator;
 import net.bioclipse.balloon.business.IBalloonManager;
+import net.bioclipse.cdk.business.ICDKManager;
+import net.bioclipse.cdk.domain.ICDKMolecule;
 import net.bioclipse.core.business.BioclipseException;
 import net.bioclipse.core.util.LogUtils;
 import net.bioclipse.jobs.BioclipseUIJob;
@@ -99,8 +101,13 @@ public class BalloonGen3DHandler extends AbstractHandler {
                                 .getContentDescription();
                 if ( contentDescirpton != null && contentDescirpton
                                      .getContentType().isKindOf( cmlType ) ) {
-                    balloon.generate3Dcoordinates( input.getRawLocation()
+                    String output =balloon.generate3Dcoordinates( input.getRawLocation()
                                     .toOSString() );
+                    ICDKManager cdk = net.bioclipse.cdk.business.Activator
+                    					.getDefault().getJavaCDKManager();
+                    List<ICDKMolecule> molecules = cdk.loadMolecules(output);
+                    cdk.saveMolecule(molecules.get(0),output,true);
+
                     return null;
                 }
             } catch ( Exception e ) {
