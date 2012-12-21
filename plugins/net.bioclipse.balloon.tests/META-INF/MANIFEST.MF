@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Balloon Tests
 Bundle-SymbolicName: net.bioclipse.balloon.tests
-Bundle-Version: 2.6.0.qualifier
+Bundle-Version: 2.6.0.vqualifier
 Bundle-Vendor: The Bioclispe Team
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,

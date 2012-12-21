@@ -2,7 +2,7 @@
 <feature
       id="net.bioclipse.balloon_feature"
       label="Balloon"
-      version="2.6.0.qualifier"
+      version="2.6.0.vqualifier"
       provider-name="bioclipse.net"
       plugin="net.bioclipse.balloon.business"
       os="linux,macosx,win32">
