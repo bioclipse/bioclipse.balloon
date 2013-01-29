@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="net.bioclipse.balloon_feature"
-      label="Balloon Feature"
-      version="2.5.0.qualifier"
-      provider-name="The Bioclispe Team"
-      plugin="net.bioclipse.balloon.business">
+      label="Balloon"
+      version="2.6.0.vqualifier"
+      provider-name="bioclipse.net"
+      plugin="net.bioclipse.balloon.business"
+      os="linux,macosx,win32">
 
    <description>
-      Balloon provides Bioclipse with features to generate 3D conformations from chemical structures.
+      3D conformer generation for chemical structures using Balloon (Vainio et al. 2007).
    </description>
 
    <copyright>
@@ -26,12 +27,9 @@ This feature and the accompanying materials are made available under the terms o
 The Eclipse Public License accompanies this distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
    </license>
 
-   <url>
-      <update label="Bioclipse2 update site" url="http://update2.bioclipse.net"/>
-   </url>
-
    <requires>
-      <import feature="net.bioclipse.chemoinformatics_feature" version="2.4.0" match="greaterOrEqual"/>
+      <import feature="net.bioclipse.core_feature" version="2.5" match="greaterOrEqual"/>
+      <import feature="net.bioclipse.chemoinformatics_feature" version="2.5" match="greaterOrEqual"/>
    </requires>
 
    <plugin
@@ -73,7 +71,7 @@ The Eclipse Public License accompanies this distribution, and is available at ht
          unpack="false"/>
 
    <plugin
-         id="net.bioclipse.jnati"
+         id="jnati-proc"
          download-size="0"
          install-size="0"
          version="0.0.0"

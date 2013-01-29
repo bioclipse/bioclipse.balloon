@@ -36,15 +36,23 @@
                     <!--test property="org.eclipse.core.resources.contentTypeId" 
             	    	value="net.bioclipse.contenttypes.smi"/-->
    	      		     <test property="org.eclipse.core.resources.contentTypeId" 
+        	        	value="net.bioclipse.contenttypes.sdf0d"/>
+   	      		     <test property="org.eclipse.core.resources.contentTypeId" 
         	        	value="net.bioclipse.contenttypes.sdf2d"/>
    	      		     <test property="org.eclipse.core.resources.contentTypeId" 
         	        	value="net.bioclipse.contenttypes.sdf3d"/>
+   	      		     <test property="org.eclipse.core.resources.contentTypeId" 
+        	        	value="net.bioclipse.contenttypes.mdlMolFile0D"/>
    	      		     <test property="org.eclipse.core.resources.contentTypeId" 
         	        	value="net.bioclipse.contenttypes.mdlMolFile2D"/>
    	      		     <test property="org.eclipse.core.resources.contentTypeId" 
         	        	value="net.bioclipse.contenttypes.mdlMolFile3D"/>
   	      		     <test property="org.eclipse.core.resources.contentTypeId" 
         	        	value="net.bioclipse.contenttypes.cml.singleMolecule2d"/>
+  	      		     <!--test property="org.eclipse.core.resources.contentTypeId" 
+        	        	value="net.bioclipse.contenttypes.cml.singleMolecule0d"/>
+  	      		     <test property="org.eclipse.core.resources.contentTypeId" 
+        	        	value="net.bioclipse.contenttypes.cml.singleMolecule3d"/-->
                	</or>
                </adapt>
 	        </iterate>
@@ -119,6 +127,12 @@
             file="toc.xml"
             primary="true">
       </toc>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="net.bioclipse.balloon.ui.BalloonPreferenceInitializer">
+      </initializer>
    </extension>
 
 </plugin>

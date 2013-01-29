@@ -2,25 +2,20 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Balloon
 Bundle-SymbolicName: net.bioclipse.balloon.business;singleton:=true
-Bundle-Version: 2.5.0.qualifier
+Bundle-Version: 2.6.0.vqualifier
 Bundle-Activator: net.bioclipse.balloon.business.Activator
 Bundle-Vendor: The Bioclipse Team
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  net.bioclipse.core,
  org.eclipse.core.resources,
- net.bioclipse.scripting,
- net.bioclipse.balloon,
- net.bioclipse.chemoinformatics,
  net.bioclipse.ui.business,
  net.bioclipse.cdk.business,
- net.bioclipse.cml,
- net.bioclipse.ui,
- org.eclipse.help,
- net.bioclipse.ioformats,
- org.openscience.cdk.ioformats,
+ org.openscience.cdk.interfaces,
+ org.openscience.cdk.io,
  org.openscience.cdk.core,
- org.openscience.cdk.interfaces;bundle-version="1.3.8"
+ org.eclipse.core.filesystem;bundle-version="1.3.200",
+ org.openscience.cdk.ioformats
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: net.bioclipse.balloon.business
