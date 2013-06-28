@@ -3,7 +3,7 @@ Eclipse-ExtensibleAPI: true
 Bundle-ManifestVersion: 2
 Bundle-Name: Balloon
 Bundle-SymbolicName: net.bioclipse.balloon
-Bundle-Version: 2.6.0.vqualifier
+Bundle-Version: 2.6.1.qualifier
 Bundle-Activator: net.bioclipse.balloon.Activator
 Bundle-Vendor: The Bioclipse Project
 Require-Bundle: org.eclipse.ui,
