@@ -103,6 +103,18 @@ public class BalloonGen3DHandler extends AbstractHandler {
                                      .getContentType().isKindOf( cmlType ) ) {
                     String output =balloon.generate3Dcoordinates( input.getRawLocation()
                                     .toOSString() );
+                    Display.getDefault().syncExec( new Runnable(){
+                        public void run() {
+                            for (IResource res : final_foldersToRefresh){
+                                try {
+                                    res.refreshLocal( IResource.DEPTH_ONE, new NullProgressMonitor() );
+                                } catch ( CoreException e ) {
+                                    logger.error( "Could not refresh resource: " + res + " - " + e.getMessage() );
+                                }
+                            }
+
+                        }
+                    });
                     ICDKManager cdk = net.bioclipse.cdk.business.Activator
                     					.getDefault().getJavaCDKManager();
                     List<ICDKMolecule> molecules = cdk.loadMolecules(output);
