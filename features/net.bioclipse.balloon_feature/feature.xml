@@ -30,6 +30,7 @@ The Eclipse Public License accompanies this distribution, and is available at ht
    <requires>
       <import feature="net.bioclipse.core_feature" version="2.5" match="greaterOrEqual"/>
       <import feature="net.bioclipse.chemoinformatics_feature" version="2.5" match="greaterOrEqual"/>
+      <import plugin="org.openscience.cdk_bundle"/>
    </requires>
 
    <plugin
