@@ -2,7 +2,7 @@
 <feature
       id="net.bioclipse.balloon_feature"
       label="Balloon"
-      version="2.6.2.qualifier"
+      version="2.7.0.qualifier"
       provider-name="bioclipse.net"
       plugin="net.bioclipse.balloon.business"
       os="linux,macosx,win32">
@@ -30,6 +30,7 @@ The Eclipse Public License accompanies this distribution, and is available at ht
    <requires>
       <import feature="net.bioclipse.core_feature" version="2.5" match="greaterOrEqual"/>
       <import feature="net.bioclipse.chemoinformatics_feature" version="2.5" match="greaterOrEqual"/>
+      <import plugin="org.openscience.cdk_bundle"/>
    </requires>
 
    <plugin
